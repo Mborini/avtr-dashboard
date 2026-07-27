@@ -7,39 +7,71 @@ import {
   Title,
   Paper,
   Loader,
+  Button,
 } from "@mantine/core";
 
 import FailureTable from "./components/FailureTable";
 import FailureFilters from "./components/FailureFilters";
 import ActivitiesModal from "./components/ActivitiesModal";
 import Link from "next/link";
-import { Button } from "@mantine/core";
+
+
+type Activity = {
+  activityType?: string;
+  userName?: string;
+  oldValue?: string;
+  newValue?: string;
+  commentsAr?: string;
+  isAvtrStaff?: boolean;
+  staffParty?: string;
+  images?: string[];
+  videos?: string[];
+};
+
+
+type Failure = {
+  id?: number | string;
+  status?: string;
+  blockName?: string;
+  districtName?: string;
+  activities?: Activity[];
+};
+
+
+type StatusMap = Record<string, string>;
+
+
 
 export default function Page() {
 
-  const [items, setItems] = useState([]);
-  const [loading, setLoading] = useState(false);
 
+  const [items, setItems] = useState<Failure[]>([]);
 
-  // API District
-  const [district, setDistrict] = useState("");
-
-
-  // Separate Searches
-  const [searchId, setSearchId] = useState("");
-  const [searchStatus, setSearchStatus] = useState("");
-  const [searchBlock, setSearchBlock] = useState("");
-  const [searchDistrict, setSearchDistrict] = useState("");
-  const [searchUser, setSearchUser] = useState("");
-
-
-  // Modal
-  const [opened, setOpened] = useState(false);
-  const [selectedActivities, setSelectedActivities] = useState([]);
+  const [loading, setLoading] = useState<boolean>(false);
 
 
 
-  const statusColors = {
+  const [district, setDistrict] = useState<string>("");
+
+
+
+  const [searchId, setSearchId] = useState<string>("");
+  const [searchStatus, setSearchStatus] = useState<string>("");
+  const [searchBlock, setSearchBlock] = useState<string>("");
+  const [searchDistrict, setSearchDistrict] = useState<string>("");
+  const [searchUser, setSearchUser] = useState<string>("");
+
+
+
+  const [opened, setOpened] = useState<boolean>(false);
+
+  const [selectedActivities, setSelectedActivities] =
+    useState<Activity[]>([]);
+
+
+
+
+  const statusColors: StatusMap = {
 
     PendingSpValidation: "black",
     InProgress: "green",
@@ -53,7 +85,8 @@ export default function Page() {
 
 
 
-  const statusName = {
+
+  const statusName: StatusMap = {
 
     PendingSpValidation: "في انتظار القبول",
     InProgress: "قيد التنفيذ",
@@ -68,7 +101,8 @@ export default function Page() {
 
 
 
-  async function getData() {
+
+  async function getData(): Promise<void> {
 
     try {
 
@@ -92,6 +126,7 @@ export default function Page() {
         );
 
       }
+
 
 
 
@@ -155,7 +190,6 @@ export default function Page() {
     return items.filter((item) => {
 
 
-
       const matchId =
 
         !searchId ||
@@ -167,8 +201,6 @@ export default function Page() {
           .includes(
             searchId.toLowerCase()
           );
-
-
 
 
 
@@ -187,16 +219,13 @@ export default function Page() {
 
         ||
 
-        (statusName[item.status] ?? "")
+        (statusName[item.status ?? ""] ?? "")
 
           .toLowerCase()
 
           .includes(
             searchStatus.toLowerCase()
           );
-
-
-
 
 
 
@@ -213,8 +242,6 @@ export default function Page() {
           .includes(
             searchBlock.toLowerCase()
           );
-
-
 
 
 
@@ -238,13 +265,12 @@ export default function Page() {
 
 
 
-
-
       const matchUser =
 
         !searchUser ||
 
         item.activities?.some(
+
           (activity) =>
 
             (activity.userName ?? "")
@@ -254,8 +280,8 @@ export default function Page() {
               .includes(
                 searchUser.toLowerCase()
               )
-        );
 
+        );
 
 
 
@@ -265,35 +291,24 @@ export default function Page() {
       return (
 
         matchId &&
-
         matchStatus &&
-
         matchBlock &&
-
         matchDistrict &&
-
         matchUser
 
       );
 
 
-
     });
-
 
 
   }, [
 
     items,
-
     searchId,
-
     searchStatus,
-
     searchBlock,
-
     searchDistrict,
-
     searchUser
 
   ]);
@@ -303,18 +318,19 @@ export default function Page() {
 
 
 
+  function openActivities(
+    activities: Activity[] = []
+  ): void {
 
-  function openActivities(activities) {
 
     setSelectedActivities(
-      activities || []
+      activities
     );
+
 
     setOpened(true);
 
   }
-
-
 
 
 
@@ -325,28 +341,36 @@ export default function Page() {
     <Container size="xl" py="xl">
 
 
-     
-
-<Title mb="lg">
-  Failures Dashboard
-</Title>
+      <Title mb="lg">
+        Failures Dashboard
+      </Title>
 
 
-<Link href="/failures/stats">
 
-  <Button
-    mb="lg"
-    radius="xl"
-    variant="gradient"
-    gradient={{
-      from: "blue",
-      to: "cyan",
-    }}
-  >
-    عرض الإحصائيات
-  </Button>
+      <Link href="/failures/stats">
 
-</Link>
+        <Button
+
+          mb="lg"
+
+          radius="xl"
+
+          variant="gradient"
+
+          gradient={{
+            from: "blue",
+            to: "cyan",
+          }}
+
+        >
+
+          عرض الإحصائيات
+
+        </Button>
+
+
+      </Link>
+
 
 
 
@@ -364,90 +388,52 @@ export default function Page() {
 
         <FailureFilters
 
-
           district={district}
-
           setDistrict={setDistrict}
 
-
-
           searchId={searchId}
-
           setSearchId={setSearchId}
 
-
-
           searchStatus={searchStatus}
-
           setSearchStatus={setSearchStatus}
 
-
-
           searchBlock={searchBlock}
-
           setSearchBlock={setSearchBlock}
 
-
-
           searchDistrict={searchDistrict}
-
           setSearchDistrict={setSearchDistrict}
 
-
-
           searchUser={searchUser}
-
           setSearchUser={setSearchUser}
 
-
-
           onLoad={getData}
-
 
         />
 
 
 
-
-
-
-
         {
+          loading
 
-          loading ?
-
+          ?
 
           <Loader />
 
-
           :
-
 
           <FailureTable
 
-
             items={filteredItems}
-
 
             statusColors={statusColors}
 
-
             statusName={statusName}
 
-
-            onOpenActivities={
-              openActivities
-            }
-
+            onOpenActivities={openActivities}
 
           />
 
-
         }
-
-
-
-
 
 
 
@@ -456,28 +442,19 @@ export default function Page() {
 
 
 
-
-
-
       <ActivitiesModal
 
-
         opened={opened}
-
 
         onClose={() =>
           setOpened(false)
         }
 
-
         activities={
           selectedActivities
         }
 
-
       />
-
-
 
 
 
