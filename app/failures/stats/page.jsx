@@ -219,6 +219,7 @@ export default function StatsPage() {
   return (
 
     <Container
+    dir="rtl"
       size="xl"
       py="xl"
     >

@@ -13,6 +13,7 @@ import {
 
 
 import {
+  IconBuildings,
   IconMapPin,
 } from "@tabler/icons-react";
 
@@ -89,44 +90,52 @@ border:"1px solid #edf2f7",
 {/* ================= HEADER ================= */}
 
 
-<Group justify="space-between">
+<Group
+  justify="space-between"
+  align="center"
+  mb="xs"
+>
 
+
+{/* اسم المنطقة */}
 
 <Group gap="sm">
 
 
 <Badge
-size="xl"
-radius="xl"
-variant="light"
-color="blue"
+  size="xl"
+  radius="xl"
+  variant="light"
+  color="blue"
+  p={8}
 >
 
-<IconMapPin size={18}/>
+  <IconBuildings size={20}/>
 
 </Badge>
 
 
 
-<div>
-
-<Text
-fw={800}
-size="md"
+<Group
+  justify="space-between"
+  align="center"
 >
-{district}
-</Text>
 
 
-<Text
-size="xs"
-c="dimmed"
->
-عدد المخالفات في المنطقة
-</Text>
+{/* اسم المنطقة */}
+
+<Group gap="sm">
 
 
-</div>
+
+
+
+  <Text
+    fw={900}
+    size="lg"
+  >
+    {district}
+  </Text>
 
 
 </Group>
@@ -134,16 +143,53 @@ c="dimmed"
 
 
 
-<Badge
-size="lg"
-radius="xl"
-variant="light"
-color="blue"
->
+{/* الإجمالي */}
 
-{data.total}
+<Group gap="xs">
 
-</Badge>
+  <Text
+    size="sm"
+    c="dimmed"
+    fw={700}
+  >
+    إجمالي المخالفات
+  </Text>
+
+
+  <Badge
+
+    size="lg"
+
+    radius="xl"
+
+    variant="filled"
+
+    color="blue"
+
+  >
+
+    {data.total}
+
+  </Badge>
+
+
+</Group>
+
+
+
+</Group>
+
+
+</Group>
+
+
+
+
+
+{/* العدد الكلي */}
+
+
+
 
 
 
@@ -157,40 +203,36 @@ color="blue"
 
 
 <Card
-
-mt="md"
-
-radius="lg"
-
-p="sm"
-
-style={{
-
-background:"#f8fafc",
-
-border:"1px solid #edf2f7"
-
-}}
-
+  mt="md"
+  radius="xl"
+  p="md"
+  style={{
+    background: "#f8fafc",
+    border: "1px solid #edf2f7",
+  }}
 >
 
+
+<Group
+  justify="center"
+  mb="sm"
+>
 
 <Text
-fw={700}
-size="sm"
-mb="xs"
+  fw={800}
+  size="md"
 >
+ملخص حالات المخالفات لمنطقة {district}</Text>
 
-ملخص الحالات
-
-</Text>
+</Group>
 
 
 
 
 <Group
-gap="xs"
-wrap="wrap"
+  justify="center"
+  gap="sm"
+  wrap="wrap"
 >
 
 
@@ -199,20 +241,41 @@ Object.entries(districtStatuses)
 .map(([status,count])=>(
 
 
-<Badge
+<Card
 
 key={status}
 
-size="lg"
+radius="lg"
 
-radius="xl"
+p="xs"
 
-variant="light"
+style={{
 
-color={
-statusConfig[status]?.color ||
-"gray"
-}
+minWidth:110,
+
+textAlign:"center",
+
+background:
+statusConfig[status]?.bg ||
+"#fff",
+
+border:
+"1px solid rgba(0,0,0,.05)"
+
+}}
+
+>
+
+
+<Text
+
+size="xs"
+
+fw={600}
+
+c="dimmed"
+
+mb={4}
 
 >
 
@@ -221,21 +284,38 @@ statusConfig[status]?.label ||
 status
 }
 
-&nbsp;
-
-({count})
+</Text>
 
 
-</Badge>
+
+<Text
+
+fw={900}
+
+size="xl"
+
+color={
+statusConfig[status]?.color ||
+"gray"
+}
+
+>
+
+{count}
+
+</Text>
+
+
+</Card>
 
 
 ))
+
 }
 
 
 
 </Group>
-
 
 
 </Card>
@@ -260,9 +340,9 @@ cols={{
 
 base:1,
 
-sm:2,
+sm:4,
 
-md:3
+md:4
 
 }}
 
@@ -299,39 +379,64 @@ border:"1px solid #f1f3f5"
 
 
 <Group
-
-justify="space-between"
-
-mb="xs"
-
+  justify="space-between"
+  mb="xs"
 >
 
 
-<Text
-fw={700}
-size="sm"
->
+<Group gap="xs">
 
-📍 {block}
+  <Badge
+    size="lg"
+    radius="xl"
+    variant="light"
+    color="blue"
+    p={8}
+  >
+    <IconMapPin size={18}/>
+  </Badge>
 
-</Text>
 
-
-
-<Badge
-size="sm"
-variant="light"
->
-
-{blockData.total}
-
-</Badge>
-
+  <Text
+    fw={800}
+    size="sm"
+  >
+    {block}
+  </Text>
 
 
 </Group>
 
 
+
+
+<Group gap="xs">
+
+
+  <Text
+    size="xs"
+    c="dimmed"
+    fw={600}
+  >
+    إجمالي المخالفات
+  </Text>
+
+
+  <Badge
+    size="lg"
+    radius="xl"
+    variant="filled"
+    color="blue"
+  >
+    {blockData.total}
+  </Badge>
+
+
+</Group>
+
+
+
+</Group>
 
 
 
