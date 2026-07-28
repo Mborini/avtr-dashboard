@@ -14,8 +14,9 @@ import {
   Center,
 } from "@mantine/core";
 
-import FailureStats from "@/app/components/FailureStats";
 import FailureStatsCollapsible from "../../components/FailureStats1";
+import FailureStats from "../../components/Failures/FailureStats";
+
 
 
 export default function StatsPage() {
