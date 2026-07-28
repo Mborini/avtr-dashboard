@@ -12,6 +12,7 @@ import {
   SimpleGrid,
   Avatar,
   Modal,
+  Button,
 } from "@mantine/core";
 
 
@@ -41,6 +42,12 @@ export default function DistrictCard({
   const [selectedUser,setSelectedUser] = useState(null);
 
 
+  // Modal ملخص الحالات
+  const [summaryModalOpened,setSummaryModalOpened] = useState(false);
+
+
+  // Modal ملخص المستخدمين
+  const [usersModalOpened,setUsersModalOpened] = useState(false);
 
   // ==================================
   // تجميع الحالات لكل منطقة
@@ -48,7 +55,74 @@ export default function DistrictCard({
 
   const districtStatuses = {};
 
+// ==================================
+// تجميع المستخدمين حسب الحالة
+// ==================================
 
+const districtUsersByStatus = {};
+
+
+
+Object.values(data.blocks || {})
+.forEach((block)=>{
+
+
+  Object.entries(block.statuses || {})
+  .forEach(([status,statusData])=>{
+
+
+    if(
+      !districtUsersByStatus[status]
+    ){
+
+      districtUsersByStatus[status] = {};
+
+    }
+
+
+
+    Object.entries(
+      statusData.users || {}
+    )
+    .forEach(([user,userData])=>{
+
+
+      if(
+        !districtUsersByStatus[status][user]
+      ){
+
+        districtUsersByStatus[status][user] = {
+          count:0,
+          ids:[]
+        };
+
+      }
+
+
+
+      districtUsersByStatus[status][user].count 
+      += userData.count;
+
+
+
+      districtUsersByStatus[status][user].ids
+      =
+      [
+        ...districtUsersByStatus[status][user].ids,
+        ...(userData.ids || [])
+      ];
+
+
+
+    });
+
+
+
+  });
+
+
+
+});
   Object.keys(statusConfig).forEach((status)=>{
 
     districtStatuses[status] = 0;
@@ -82,7 +156,31 @@ export default function DistrictCard({
 
 
 
+const usersByStatus = {};
 
+Object.keys(statusConfig).forEach((status) => {
+  usersByStatus[status] = {};
+});
+
+Object.values(data.blocks || {}).forEach((block) => {
+
+  Object.entries(block.statuses || {}).forEach(([status, statusData]) => {
+
+    if (summaryOnlyStatuses.includes(status)) return;
+
+    Object.entries(statusData.users || {}).forEach(([user, userData]) => {
+
+      if (!usersByStatus[status][user]) {
+        usersByStatus[status][user] = 0;
+      }
+
+      usersByStatus[status][user] += userData.count;
+
+    });
+
+  });
+
+});
 
 
 return (
@@ -162,7 +260,39 @@ size="lg"
 
 </Group>
 
+<Group
+  justify="center"
+  mt="md"
+  mb="md"
+>
 
+<Button
+  size="xs"
+  radius="xl"
+  variant="light"
+  onClick={() =>
+    setSummaryModalOpened(true)
+  }
+>
+  ملخص حالات المخالفات حسب المنطقة
+</Button>
+
+
+<Button
+  size="xs"
+  radius="xl"
+  color="grape"
+  variant="light"
+  onClick={() =>
+    setUsersModalOpened(true)
+  }
+>
+ملخص حالات المخالفات حسب المستخدمين
+
+</Button>
+
+
+</Group>
 
 
 <Group gap="xs">
@@ -207,168 +337,6 @@ color="blue"
 
 
 </Group>
-
-
-
-
-
-
-
-{/* ================= STATUS SUMMARY ================= */}
-
-
-
-<Card
-
-mt="md"
-
-radius="xl"
-
-p="md"
-
-style={{
-
-background:"#f8fafc",
-
-border:"1px solid #edf2f7",
-
-}}
-
->
-
-
-<Group
-
-justify="center"
-
-mb="sm"
-
->
-
-<Text
-
-fw={800}
-
-size="md"
-
->
-
-ملخص حالات المخالفات لمنطقة {district}
-
-</Text>
-
-
-</Group>
-
-
-
-
-
-<Group
-
-justify="center"
-
-gap="sm"
-
-wrap="wrap"
-
->
-
-
-
-{
-
-Object.entries(districtStatuses)
-
-.map(([status,count])=>(
-
-
-<Card
-
-key={status}
-
-radius="lg"
-
-p="xs"
-
-style={{
-
-minWidth:110,
-
-textAlign:"center",
-
-background:
-
-statusConfig[status]?.bg || "#fff",
-
-border:"1px solid rgba(0,0,0,.05)"
-
-}}
-
->
-
-
-<Text
-
-size="xs"
-
-fw={600}
-
-c="dimmed"
-
-mb={4}
-
->
-
-{
-
-statusConfig[status]?.label || status
-
-}
-
-</Text>
-
-
-
-<Text
-
-fw={900}
-
-size="xl"
-
->
-
-{count}
-
-</Text>
-
-
-
-</Card>
-
-
-))
-
-}
-
-
-
-</Group>
-
-
-</Card>
-
-
-
-
-
-
-
-<Divider my="md"/>
-
-
-
-
 
 
 
@@ -883,7 +851,301 @@ color="blue"
 
 
 
+<Modal
+  dir="rtl"
+  opened={summaryModalOpened}
+  onClose={() => setSummaryModalOpened(false)}
+  centered
+  size="lg"
+  title="ملخص حالات المخالفات حسب المنطقة"
+  styles={{
+    title:{
+      fontSize:"15px",
+      fontWeight:800
+    }
+  }}
+>
 
+
+<SimpleGrid
+  cols={{
+    base:1,
+    sm:3
+  }}
+  spacing="sm"
+>
+
+
+{
+Object.entries(districtStatuses)
+.map(([status,count])=>(
+
+
+<Card
+
+key={status}
+
+radius="lg"
+
+p="md"
+
+style={{
+
+textAlign:"center",
+
+background:
+statusConfig[status]?.bg || "#fff",
+
+border:"1px solid #edf2f7"
+
+}}
+
+>
+
+
+<Text
+
+size="sm"
+
+fw={700}
+
+c="dimmed"
+
+mb={5}
+
+>
+
+{
+statusConfig[status]?.label || status
+}
+
+</Text>
+
+
+
+<Text
+
+size="xl"
+
+fw={900}
+
+>
+
+{count}
+
+</Text>
+
+
+
+</Card>
+
+
+))
+
+}
+
+
+
+</SimpleGrid>
+
+
+
+</Modal><Modal
+  dir="rtl"
+  opened={usersModalOpened}
+  onClose={() => setUsersModalOpened(false)}
+  centered
+  size="lg"
+  title="ملخص حالات المخالفات حسب المستخدمين"
+  styles={{
+    title:{
+      fontSize:"15px",
+      fontWeight:800
+    }
+  }}
+>
+
+
+<Stack gap="sm">
+
+
+{
+Object.entries(districtUsersByStatus)
+.map(([status,users])=>(
+
+
+<Card
+
+key={status}
+
+radius="lg"
+
+p="md"
+
+style={{
+
+background:
+statusConfig[status]?.bg || "#fff",
+
+border:"1px solid #edf2f7"
+
+}}
+
+>
+
+
+<Group
+justify="space-between"
+mb="sm"
+>
+
+
+<Text
+
+fw={800}
+
+size="sm"
+
+>
+
+{
+statusConfig[status]?.label || status
+}
+
+</Text>
+
+
+
+<Badge
+
+color={
+statusConfig[status]?.color || "gray"
+}
+
+variant="light"
+
+>
+
+{
+Object.values(users)
+.reduce(
+(sum,user)=>sum+user.count,
+0
+)
+}
+
+</Badge>
+
+
+</Group>
+
+
+
+
+
+<Stack gap={6}>
+
+
+{
+Object.entries(users)
+.map(([user,userData])=>(
+
+
+<Group
+
+key={user}
+
+justify="space-between"
+
+p="xs"
+
+style={{
+
+background:"#ffffff",
+
+borderRadius:8
+
+}}
+
+>
+
+
+<Group gap="xs">
+
+
+<Avatar
+
+size="sm"
+
+color="blue"
+
+variant="light"
+
+>
+
+{user.charAt(0)}
+
+</Avatar>
+
+
+
+<Text
+
+size="sm"
+
+fw={700}
+
+>
+
+{user}
+
+</Text>
+
+
+</Group>
+
+
+
+
+<Badge
+
+variant="outline"
+
+>
+
+{userData.count}
+
+</Badge>
+
+
+
+</Group>
+
+
+))
+
+}
+
+
+</Stack>
+
+
+
+</Card>
+
+
+))
+
+
+}
+
+
+
+</Stack>
+
+
+
+</Modal>
 
 </Card>
 
