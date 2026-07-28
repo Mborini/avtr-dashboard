@@ -12,10 +12,12 @@ import {
   Card,
   Text,
   Center,
+  Stack,
 } from "@mantine/core";
 
 import FailureStatsCollapsible from "../../components/FailureStats1";
 import FailureStats from "../../components/Failures/FailureStats";
+import { IconSearch } from "@tabler/icons-react";
 
 
 
@@ -224,163 +226,256 @@ export default function StatsPage() {
       py="xl"
     >
 
-
-     <Card
+<Card
   withBorder
   shadow="sm"
-  radius="lg"
-  p="lg"
+  radius="xl"
+  p="xl"
   mb="xl"
+  style={{
+    background:"#ffffff",
+    border:"1px solid #edf2f7"
+  }}
 >
 
-  <Group
-    justify="space-between"
-    align="center"
-    mb="lg"
-  >
 
-    <Title
-      order={2}
-    >
-      إحصائيات المخالفات
-    </Title>
+<Stack
+  align="center"
+  gap="lg"
+>
 
 
-    <Switch
+{/* العنوان والسويتش */}
 
-      size="md"
+<Group
+  justify="center"
+  align="center"
+  gap="xl"
+>
 
-      label={
-        showCollapsible
-          ? "العرض التفصيلي"
-          : "العرض المختصر"
-      }
 
-      checked={showCollapsible}
+<Title
+  order={2}
+  ta="center"
+  fw={900}
+  c="dark"
+>
 
-      onChange={(event)=>
-        setShowCollapsible(
-          event.currentTarget.checked
-        )
-      }
-
-    />
-
-  </Group>
+القراءات الحية والمباشرة من نظام QMS</Title>
 
 
 
 
 
-  <Group
-    align="end"
-    gap="md"
-  >
-
-
-    <div>
-
-      <Text
-        size="sm"
-        fw={600}
-        mb={6}
-      >
-        من تاريخ
-      </Text>
-
-
-      <input
-
-        type="date"
-
-        value={dateFrom}
-
-        onChange={(e)=>
-          setDateFrom(
-            e.target.value
-          )
-        }
-
-
-        style={{
-          height:"38px",
-          borderRadius:"8px",
-          border:"1px solid #ced4da",
-          padding:"0 12px",
-          fontSize:"14px",
-          background:"#fff",
-          width:"180px"
-        }}
-
-      />
-
-    </div>
+</Group>
 
 
 
 
 
-    <div>
-
-      <Text
-        size="sm"
-        fw={600}
-        mb={6}
-      >
-        إلى تاريخ
-      </Text>
 
 
-      <input
-
-        type="date"
-
-        value={dateTo}
-
-        onChange={(e)=>
-          setDateTo(
-            e.target.value
-          )
-        }
+{/* الفلاتر */}
 
 
-        style={{
-          height:"38px",
-          borderRadius:"8px",
-          border:"1px solid #ced4da",
-          padding:"0 12px",
-          fontSize:"14px",
-          background:"#fff",
-          width:"180px"
-        }}
+<Group
 
-      />
+justify="center"
 
-    </div>
+align="center"
+
+gap="md"
+
+wrap="wrap"
+
+>
 
 
 
+<Group
+  gap="xs"
+  align="center"
+>
 
 
-    <Button
+<Text
 
-      size="md"
+size="sm"
 
-      radius="md"
+fw={700}
 
-      loading={loading}
+>
 
-      onClick={getData}
+من تاريخ
 
-    >
-
-      عرض النتائج
-
-    </Button>
+</Text>
 
 
 
-  </Group>
+<input
+
+type="date"
+
+value={dateFrom}
+
+onChange={(e)=>
+  setDateFrom(
+    e.target.value
+  )
+}
+
+style={{
+
+height:"38px",
+
+borderRadius:"10px",
+
+border:"1px solid #dee2e6",
+
+padding:"0 10px",
+
+fontSize:"13px",
+
+background:"#f8fafc",
+
+width:"160px",
+
+outline:"none"
+
+}}
+
+/>
+
+
+</Group>
+
+
+
+
+
+
+
+<Group
+  gap="xs"
+  align="center"
+>
+
+
+<Text
+
+size="sm"
+
+fw={700}
+
+>
+
+إلى تاريخ
+
+</Text>
+
+
+
+<input
+
+type="date"
+
+value={dateTo}
+
+onChange={(e)=>
+  setDateTo(
+    e.target.value
+  )
+}
+
+style={{
+
+height:"38px",
+
+borderRadius:"10px",
+
+border:"1px solid #dee2e6",
+
+padding:"0 10px",
+
+fontSize:"13px",
+
+background:"#f8fafc",
+
+width:"160px",
+
+outline:"none"
+
+}}
+
+/>
+
+
+</Group>
+
+
+
+
+
+
+
+<Button
+
+size="sm"
+
+radius="xl"
+
+loading={loading}
+
+px="lg"
+
+style={{
+
+height:"38px"
+
+}}
+
+onClick={getData}
+
+>
+<IconSearch size={14}/>
+</Button>
+
+
+
+
+
+
+
+<Switch
+
+size="sm"
+
+label={
+  showCollapsible
+    ? "العرض التفصيلي"
+    : "العرض المختصر"
+}
+
+checked={showCollapsible}
+
+onChange={(event)=>
+  setShowCollapsible(
+    event.currentTarget.checked
+  )
+}
+
+/>
+
+
+
+
+
+</Group>
+
+
+
+
+</Stack>
 
 
 

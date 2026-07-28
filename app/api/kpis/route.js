@@ -151,30 +151,36 @@ const items = await Promise.all(
 
     const details = await detailsResponse.json();
 
+const lastActivity =
+  details.activities?.at(-1);
 
-    return {
-      id:item.id,
-      districtName:item.districtName,
-      blockName:item.blockName,
-      status:item.status,
-      activities: details.activities || []
-    };
+
+return {
+
+  id:item.id,
+
+  districtName:item.districtName,
+
+  blockName:item.blockName,
+
+  status:item.status,
+
+
+  userName:
+    lastActivity?.userName || "غير معروف",
+
+
+  activities:
+    details.activities || []
+
+};
 
   })
 
 );
 
 
-// هنا ضع الكود
-console.log(
-  items
-  .filter(x => !x.districtName)
-  .map(x => ({
-    id:x.id,
-    block:x.blockName,
-    status:x.status
-  }))
-);
+
 
 
 

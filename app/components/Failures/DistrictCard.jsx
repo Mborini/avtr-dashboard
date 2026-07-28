@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+
 import {
   Card,
   Text,
@@ -9,12 +11,14 @@ import {
   Divider,
   SimpleGrid,
   Avatar,
+  Modal,
 } from "@mantine/core";
 
 
 import {
   IconBuildings,
   IconMapPin,
+  IconUser,
 } from "@tabler/icons-react";
 
 
@@ -25,16 +29,21 @@ import {
 
 
 
+
 export default function DistrictCard({
   district,
   data
 }) {
 
 
+  const [opened,setOpened] = useState(false);
+
+  const [selectedUser,setSelectedUser] = useState(null);
+
+
 
   // ==================================
   // تجميع الحالات لكل منطقة
-  // وإضافة الحالات غير الموجودة بقيمة 0
   // ==================================
 
   const districtStatuses = {};
@@ -74,126 +83,132 @@ export default function DistrictCard({
 
 
 
+
+
 return (
 
 <Card
+
 radius="xl"
+
 p="md"
+
 shadow="xs"
+
 style={{
+
 background:"#fff",
+
 border:"1px solid #edf2f7",
+
 }}
+
 >
+
 
 
 {/* ================= HEADER ================= */}
 
 
 <Group
-  justify="space-between"
-  align="center"
-  mb="xs"
+
+justify="space-between"
+
+align="center"
+
+mb="xs"
+
 >
 
 
-{/* اسم المنطقة */}
 
 <Group gap="sm">
 
 
 <Badge
-  size="xl"
-  radius="xl"
-  variant="light"
-  color="blue"
-  p={8}
+
+size="xl"
+
+radius="xl"
+
+variant="light"
+
+color="blue"
+
+p={8}
+
 >
 
-  <IconBuildings size={20}/>
+<IconBuildings size={20}/>
 
 </Badge>
 
 
 
-<Group
-  justify="space-between"
-  align="center"
+<Text
+
+fw={900}
+
+size="lg"
+
 >
+منطقة 
+{" "}
+{district}
 
+</Text>
 
-{/* اسم المنطقة */}
-
-<Group gap="sm">
-
-
-
-
-
-  <Text
-    fw={900}
-    size="lg"
-  >
-    {district}
-  </Text>
 
 
 </Group>
 
 
 
-
-{/* الإجمالي */}
 
 <Group gap="xs">
 
-  <Text
-    size="sm"
-    c="dimmed"
-    fw={700}
-  >
-    إجمالي المخالفات
-  </Text>
+
+<Text
+
+size="sm"
+
+c="dimmed"
+
+fw={700}
+
+>
+
+إجمالي المخالفات
+
+</Text>
 
 
-  <Badge
 
-    size="lg"
+<Badge
 
-    radius="xl"
+size="lg"
 
-    variant="filled"
+radius="xl"
 
-    color="blue"
+variant="filled"
 
-  >
+color="blue"
 
-    {data.total}
+>
 
-  </Badge>
+{data.total}
+
+</Badge>
+
+
+
+</Group>
+
 
 
 </Group>
 
 
-
-</Group>
-
-
-</Group>
-
-
-
-
-
-{/* العدد الكلي */}
-
-
-
-
-
-
-</Group>
 
 
 
@@ -202,42 +217,69 @@ border:"1px solid #edf2f7",
 {/* ================= STATUS SUMMARY ================= */}
 
 
+
 <Card
-  mt="md"
-  radius="xl"
-  p="md"
-  style={{
-    background: "#f8fafc",
-    border: "1px solid #edf2f7",
-  }}
+
+mt="md"
+
+radius="xl"
+
+p="md"
+
+style={{
+
+background:"#f8fafc",
+
+border:"1px solid #edf2f7",
+
+}}
+
 >
 
 
 <Group
-  justify="center"
-  mb="sm"
+
+justify="center"
+
+mb="sm"
+
 >
 
 <Text
-  fw={800}
-  size="md"
+
+fw={800}
+
+size="md"
+
 >
-ملخص حالات المخالفات لمنطقة {district}</Text>
+
+ملخص حالات المخالفات لمنطقة {district}
+
+</Text>
+
 
 </Group>
 
 
 
 
+
 <Group
-  justify="center"
-  gap="sm"
-  wrap="wrap"
+
+justify="center"
+
+gap="sm"
+
+wrap="wrap"
+
 >
 
 
+
 {
+
 Object.entries(districtStatuses)
+
 .map(([status,count])=>(
 
 
@@ -256,11 +298,10 @@ minWidth:110,
 textAlign:"center",
 
 background:
-statusConfig[status]?.bg ||
-"#fff",
 
-border:
-"1px solid rgba(0,0,0,.05)"
+statusConfig[status]?.bg || "#fff",
+
+border:"1px solid rgba(0,0,0,.05)"
 
 }}
 
@@ -280,8 +321,9 @@ mb={4}
 >
 
 {
-statusConfig[status]?.label ||
-status
+
+statusConfig[status]?.label || status
+
 }
 
 </Text>
@@ -294,16 +336,12 @@ fw={900}
 
 size="xl"
 
-color={
-statusConfig[status]?.color ||
-"gray"
-}
-
 >
 
 {count}
 
 </Text>
+
 
 
 </Card>
@@ -324,7 +362,11 @@ statusConfig[status]?.color ||
 
 
 
+
+
 <Divider my="md"/>
+
+
 
 
 
@@ -351,9 +393,13 @@ spacing="sm"
 >
 
 
+
 {
+
 Object.entries(data.blocks || {})
+
 .map(([block,blockData])=>(
+
 
 
 <Card
@@ -379,64 +425,79 @@ border:"1px solid #f1f3f5"
 
 
 <Group
-  justify="space-between"
-  mb="xs"
+
+justify="space-between"
+
+mb="xs"
+
 >
 
 
-<Group gap="xs">
-
-  <Badge
-    size="lg"
-    radius="xl"
-    variant="light"
-    color="blue"
-    p={8}
-  >
-    <IconMapPin size={18}/>
-  </Badge>
-
-
-  <Text
-    fw={800}
-    size="sm"
-  >
-    {block}
-  </Text>
-
-
-</Group>
-
-
-
 
 <Group gap="xs">
 
 
-  <Text
-    size="xs"
-    c="dimmed"
-    fw={600}
-  >
-    إجمالي المخالفات
-  </Text>
+<Badge
+
+size="lg"
+
+radius="xl"
+
+variant="light"
+
+color="blue"
+
+p={8}
+
+>
+
+<IconMapPin size={18}/>
+
+</Badge>
 
 
-  <Badge
-    size="lg"
-    radius="xl"
-    variant="filled"
-    color="blue"
-  >
-    {blockData.total}
-  </Badge>
+
+<Text
+
+fw={800}
+
+size="sm"
+
+>
+حي 
+{" "}
+{block}
+
+</Text>
 
 
 </Group>
 
 
 
+
+<Badge
+
+size="lg"
+
+radius="xl"
+
+variant="filled"
+
+color="blue"
+
+>
+
+{blockData.total}
+
+</Badge>
+
+
+
 </Group>
+
+
+
 
 
 
@@ -445,8 +506,11 @@ border:"1px solid #f1f3f5"
 
 
 {
+
 Object.entries(blockData.statuses || {})
+
 .map(([status,statusData])=>(
+
 
 
 <Card
@@ -460,8 +524,8 @@ p="xs"
 style={{
 
 background:
-statusConfig[status]?.bg ||
-"#f8f9fa",
+
+statusConfig[status]?.bg || "#fff",
 
 border:"none"
 
@@ -478,35 +542,31 @@ justify="space-between"
 
 >
 
-
-
 <Group gap={6}>
 
 
-{
-statusConfig[status]?.icon
-}
+{statusConfig[status]?.icon}
 
 
 
 <Text
+
 fw={600}
+
 size="sm"
+
 >
 
 {
-statusConfig[status]?.label ||
-status
-}
 
+statusConfig[status]?.label || status
+
+}
 
 </Text>
 
 
-
 </Group>
-
-
 
 
 
@@ -515,8 +575,9 @@ status
 size="sm"
 
 color={
-statusConfig[status]?.color ||
-"gray"
+
+statusConfig[status]?.color || "gray"
+
 }
 
 variant="light"
@@ -536,13 +597,13 @@ variant="light"
 
 
 
-{/* المستخدمين */}
 
 {
 
 !summaryOnlyStatuses.includes(status)
 
 &&
+
 
 <Stack
 
@@ -554,8 +615,11 @@ gap={6}
 
 
 {
+
 Object.entries(statusData.users || {})
+
 .map(([user,count])=>(
+
 
 
 <Group
@@ -568,8 +632,7 @@ p={6}
 
 style={{
 
-background:
-"rgba(255,255,255,.7)",
+background:"rgba(255,255,255,.7)",
 
 borderRadius:8
 
@@ -594,13 +657,44 @@ variant="light"
 
 >
 
-{user.charAt(0)}
+<IconUser size={14}/>
 
 </Avatar>
 
 
 
-<Text size="xs">
+
+
+<Text
+
+size="xs"
+
+fw={700}
+
+style={{
+
+cursor:"pointer"
+
+}}
+
+onClick={()=>{
+
+
+setSelectedUser({
+
+name:user,
+
+ids:count.ids
+
+});
+
+
+setOpened(true);
+
+
+}}
+
+>
 
 {user}
 
@@ -613,6 +707,7 @@ variant="light"
 
 
 
+
 <Badge
 
 size="sm"
@@ -621,19 +716,20 @@ variant="outline"
 
 >
 
-{count}
+{count.count}
 
 </Badge>
+
 
 
 
 </Group>
 
 
+
 ))
 
 }
-
 
 
 </Stack>
@@ -646,6 +742,7 @@ variant="outline"
 </Card>
 
 
+
 ))
 
 }
@@ -656,7 +753,10 @@ variant="outline"
 
 
 
+
+
 </Card>
+
 
 
 ))
@@ -669,8 +769,126 @@ variant="outline"
 
 
 
+
+
+{/* ================= USER MODAL ================= */}
+
+
+<Modal
+  dir="rtl"
+  opened={opened}
+  onClose={()=>setOpened(false)}
+  title={
+    selectedUser
+      ?
+      `قائمة المخالفات التي قام ${selectedUser.name} بإجراء عليها`
+      :
+      ""
+  }
+  centered
+
+  styles={{
+    title:{
+      fontSize:"14px",
+      fontWeight:700,
+    }
+  }}
+>
+
+
+<Stack>
+
+
+<Text
+  size="sm"
+  c="dimmed"
+  fw={700}
+>
+عدد المخالفات: {selectedUser?.ids?.length || 0}
+</Text>
+
+
+
+{
+selectedUser?.ids?.map((id,index)=>(
+
+
+<Card
+
+key={`${id}-${index}`}
+
+withBorder
+
+radius="md"
+
+p="sm"
+
+>
+
+
+<Group
+
+justify="space-between"
+
+>
+
+
+<Text
+
+fw={700}
+
+>
+
+رقم المخالفة
+
+</Text>
+
+
+
+<Badge
+
+size="lg"
+
+variant="light"
+
+color="blue"
+
+>
+
+{id}
+
+</Badge>
+
+
+
+</Group>
+
+
+
 </Card>
 
+
+
+))
+
+}
+
+
+
+</Stack>
+
+
+
+</Modal>
+
+
+
+
+
+</Card>
+
+
 );
+
 
 }
