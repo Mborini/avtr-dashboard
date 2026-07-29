@@ -170,13 +170,21 @@ Object.values(data.blocks || {}).forEach((block) => {
 
     Object.entries(statusData.users || {}).forEach(([user, userData]) => {
 
-      if (!usersByStatus[status][user]) {
-        usersByStatus[status][user] = 0;
-      }
 
-      usersByStatus[status][user] += userData.count;
+  if (!usersByStatus[status]) {
+    usersByStatus[status] = {};
+  }
 
-    });
+
+  if (!usersByStatus[status][user]) {
+    usersByStatus[status][user] = 0;
+  }
+
+
+  usersByStatus[status][user] += userData.count;
+
+
+});
 
   });
 
