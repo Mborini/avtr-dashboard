@@ -17,8 +17,12 @@ import {
 
 import FailureStatsCollapsible from "../../components/FailureStats1";
 import FailureStats from "../../components/Failures/FailureStats";
-import { IconSearch } from "@tabler/icons-react";
-
+import {
+  IconSearch,
+  IconCalendar,
+  IconChartBar,
+  IconChartBarOff
+} from "@tabler/icons-react";
 
 
 export default function StatsPage() {
@@ -229,259 +233,233 @@ export default function StatsPage() {
 <Card
   withBorder
   shadow="sm"
-  radius="xl"
-  p="xl"
+  radius="30"
+  p={{ base: "md", sm: "xl" }}
   mb="xl"
   style={{
-    background:"#ffffff",
-    border:"1px solid #edf2f7"
+    background: "#ffffff",
+    border: "1px solid #edf2f7",
+    boxShadow: "0 10px 35px rgba(0,0,0,.05)"
   }}
 >
 
+  <Stack
+    align="center"
+    gap="lg"
+    w="100%"
+  >
 
-<Stack
-  align="center"
-  gap="lg"
->
 
+    {/* ================= TITLE ================= */}
 
-{/* العنوان والسويتش */}
+    <Title
+      order={2}
+      ta="center"
+      fw={900}
+      c="#1c7ed6"
+      style={{
+        fontSize: "clamp(20px,4vw,30px)",
+        lineHeight: 1.3
+      }}
+    >
+منصة الرصد والتحليل التشغيلي للمخالفات ومؤشرات الأداء   </Title>
 
-<Group
-  justify="center"
-  align="center"
-  gap="xl"
->
 
 
-<Title
-  order={2}
-  ta="center"
-  fw={900}
-  c="dark"
->
+    {/* ================= FILTERS ================= */}
 
-القراءات الحية والمباشرة من نظام QMS</Title>
 
+    <Group
+      justify="center"
+      align="center"
+      gap="md"
+      wrap="wrap"
+      w="100%"
+    >
 
 
 
+      {/* FROM DATE */}
 
-</Group>
+      <Group
+        gap="xs"
+        align="center"
+        justify="center"
+        wrap="wrap"
+      >
 
+        <Text
+          size="sm"
+          fw={700}
+        >
+          من تاريخ
+        </Text>
 
 
+        <input
 
+          type="date"
 
+          value={dateFrom}
 
+          onChange={(e)=>
+            setDateFrom(e.target.value)
+          }
 
-{/* الفلاتر */}
+          style={{
 
+            height:"30px",
 
-<Group
+            borderRadius:"14px",
 
-justify="center"
+            border:"1px solid #dee2e6",
 
-align="center"
+            padding:"0 12px",
 
-gap="md"
+            fontSize:"13px",
 
-wrap="wrap"
+            background:"#f8fafc",
 
->
+            width:"140px",
 
+            outline:"none"
 
+          }}
 
-<Group
-  gap="xs"
-  align="center"
->
+        />
 
 
-<Text
+      </Group>
 
-size="sm"
 
-fw={700}
 
->
 
-من تاريخ
 
-</Text>
+      {/* TO DATE */}
 
 
+      <Group
+        gap="xs"
+        align="center"
+        justify="center"
+        wrap="wrap"
+      >
 
-<input
+        <Text
+          size="sm"
+          fw={700}
+        >
+          إلى تاريخ
+        </Text>
 
-type="date"
 
-value={dateFrom}
+        <input
 
-onChange={(e)=>
-  setDateFrom(
-    e.target.value
-  )
-}
+          type="date"
 
-style={{
+          value={dateTo}
 
-height:"38px",
+          onChange={(e)=>
+            setDateTo(e.target.value)
+          }
 
-borderRadius:"10px",
+           style={{
 
-border:"1px solid #dee2e6",
+            height:"30px",
 
-padding:"0 10px",
+            borderRadius:"14px",
 
-fontSize:"13px",
+            border:"1px solid #dee2e6",
 
-background:"#f8fafc",
+            padding:"0 12px",
 
-width:"160px",
+            fontSize:"13px",
 
-outline:"none"
+            background:"#f8fafc",
 
-}}
+            width:"140px",
 
-/>
+            outline:"none"
 
+          }}
 
-</Group>
+        />
 
 
+      </Group>
 
 
 
 
 
-<Group
-  gap="xs"
-  align="center"
->
+      {/* SEARCH BUTTON */}
 
 
-<Text
+      <Button
 
-size="sm"
+        size="sm"
 
-fw={700}
+        radius="xl"
 
->
+        loading={loading}
 
-إلى تاريخ
+        px="lg"
 
-</Text>
+        w={{
+          base:"75%",
+          sm:"auto"
+        }}
 
+        style={{
 
+          height:"30px"
 
-<input
+        }}
 
-type="date"
+        onClick={getData}
 
-value={dateTo}
+      >
 
-onChange={(e)=>
-  setDateTo(
-    e.target.value
-  )
-}
+        استعلام
 
-style={{
+      </Button>
 
-height:"38px",
 
-borderRadius:"10px",
 
-border:"1px solid #dee2e6",
 
-padding:"0 10px",
 
-fontSize:"13px",
+      {/* SWITCH */}
 
-background:"#f8fafc",
 
-width:"160px",
+      <Switch
 
-outline:"none"
+        size="sm"
 
-}}
+        label={
+          showCollapsible
+            ? "العرض التفصيلي"
+            : "العرض المختصر"
+        }
 
-/>
+        checked={showCollapsible}
 
+        onChange={(event)=>
+          setShowCollapsible(
+            event.currentTarget.checked
+          )
+        }
 
-</Group>
+      />
 
 
 
+    </Group>
 
 
-
-
-<Button
-
-size="sm"
-
-radius="xl"
-
-loading={loading}
-
-px="lg"
-
-style={{
-
-height:"38px"
-
-}}
-
-onClick={getData}
-
->
-<IconSearch size={14}/>
-</Button>
-
-
-
-
-
-
-
-<Switch
-
-size="sm"
-
-label={
-  showCollapsible
-    ? "العرض التفصيلي"
-    : "العرض المختصر"
-}
-
-checked={showCollapsible}
-
-onChange={(event)=>
-  setShowCollapsible(
-    event.currentTarget.checked
-  )
-}
-
-/>
-
-
-
-
-
-</Group>
-
-
-
-
-</Stack>
-
+  </Stack>
 
 
 </Card>
-
-
 
 
 

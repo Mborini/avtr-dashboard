@@ -282,78 +282,66 @@ export default function DistrictCard({
       {/* ================= HEADER ================= */}
 
 
-  <Group
-  justify="space-between"
-  align="center"
-  mb="xs"
-  style={{
-    position: "relative",
-    minHeight: 50,
-  }}
->
+      <Group
+        justify="space-between"
+        align="center"
+        mb="xs"
+        style={{
+          position: "relative",
+          minHeight: 50,
+        }}
+      >
 
-  {/* اسم المنطقة بالمنتصف الحقيقي */}
-  <Group
-    gap="sm"
-    style={{
-      position: "absolute",
-      left: "50%",
-      transform: "translateX(-50%)",
-      width: "max-content",
-      maxWidth: "70%",
-    }}
-  >
+        {/* اسم المنطقة بالمنتصف الحقيقي */}
+        <Group
+          gap="sm"
+          style={{
+            position: "absolute",
+            left: "50%",
+            transform: "translateX(-50%)",
+            width: "max-content",
+            maxWidth: "70%",
+          }}
+        >
 
-    <Badge
-      size="xl"
-      radius="xl"
-      variant="filled"
-      p={8}
-      style={{
-        background: districtTheme.main,
-        flexShrink: 0,
-      }}
-    >
-      <IconBuildings size={20} />
-    </Badge>
-
-
-    <Text
-      fw={900}
-      c={districtTheme.main}
-      ta="center"
-      style={{
-        fontSize: "clamp(20px, 4vw, 32px)",
-        lineHeight: 1.1,
-        letterSpacing: "-0.5px",
-        whiteSpace: "nowrap",
-        overflow: "hidden",
-        textOverflow: "ellipsis",
-      }}
-    >
-      منطقة {district}
-    </Text>
-
-  </Group>
+          <Badge
+            size="xl"
+            radius="xl"
+            variant="filled"
+            p={8}
+            style={{
+              background: districtTheme.main,
+              flexShrink: 0,
+            }}
+          >
+            <IconBuildings size={20} />
+          </Badge>
 
 
-  {/* الزر يمين */}
-  <Button
-    size="xs"
-    radius="xl"
-    color="grape"
-    variant="light"
-    onClick={() => setUsersModalOpened(true)}
-    leftSection={<IconEye size={16} />}
-    style={{
-      marginLeft: "auto",
-    }}
-  >
-    إنجاز المستخدمين
-  </Button>
+          <Text
+            fw={900}
+            c={districtTheme.main}
+            ta="center"
+            style={{
+              fontSize: "clamp(20px, 4vw, 32px)",
+              lineHeight: 1.1,
+              letterSpacing: "-0.5px",
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }}
+          >
+            منطقة {district}
+          </Text>
+
+        </Group>
 
 
-</Group>
+        {/* الزر يمين */}
+
+
+
+      </Group>
       <Card
 
         radius="30"
@@ -591,7 +579,19 @@ export default function DistrictCard({
 
             }
 
-
+            <Badge
+              radius="xl"
+              size="lg"
+              color="#66a80f"
+              variant="light"
+              onClick={() => setUsersModalOpened(true)}
+              leftSection={<IconEye size={16} />}
+              style={{
+                marginLeft: "auto",
+              }}
+            >
+              استعرض انجازات كل مستخدم 
+               </Badge>
           </Group>
 
 
@@ -623,340 +623,340 @@ export default function DistrictCard({
       >
 
 
-{
-  Object.entries(data.blocks || {})
-    .map(([block, blockData]) => (
+        {
+          Object.entries(data.blocks || {})
+            .map(([block, blockData]) => (
 
-      <Card
+              <Card
 
-        key={block}
+                key={block}
 
-        radius="md"
+                radius="md"
 
-        p="xs"
+                p="xs"
 
-        shadow="xs"
+                shadow="xs"
 
-        style={{
+                style={{
 
-          background:
-            "rgba(255,255,255,0.45)",
+                  background:
+                    "rgba(255,255,255,0.45)",
 
-          backdropFilter:
-            "blur(14px)",
+                  backdropFilter:
+                    "blur(14px)",
 
-          WebkitBackdropFilter:
-            "blur(14px)",
+                  WebkitBackdropFilter:
+                    "blur(14px)",
 
-          border:
-            "1px solid rgba(255,255,255,0.6)",
+                  border:
+                    "1px solid rgba(255,255,255,0.6)",
 
-          boxShadow:
-            "0 8px 30px rgba(0,0,0,0.08)"
+                  boxShadow:
+                    "0 8px 30px rgba(0,0,0,0.08)"
 
-        }}
+                }}
 
-      >
+              >
 
 
-        {/* HEADER BLOCK */}
+                {/* HEADER BLOCK */}
 
-        <Group
+                <Group
 
-          justify="space-between"
+                  justify="space-between"
 
-          mb={5}
-
-        >
-
-
-          <Group gap={5}>
-
-
-            <Badge
-
-              size="sm"
-
-              radius="xl"
-
-              variant="light"
-
-              color="blue"
-
-              p={5}
-
-            >
-
-              <IconMapPin size={14} />
-
-            </Badge>
-
-
-
-            <Text
-
-              fw={700}
-
-              size="md"
-
-            >
-
-              حي {block}
-
-            </Text>
-
-
-          </Group>
-
-
-
-          <Badge
-
-            size="md"
-
-            radius="xl"
-
-            variant="filled"
-
-            color="blue"
-
-          >
-
-            {blockData.total}
-
-          </Badge>
-
-
-        </Group>
-
-
-
-
-        <Stack gap={4}>
-
-
-          {
-            Object.entries(blockData.statuses || {})
-              .map(([status, statusData]) => (
-
-
-                <Card
-
-                  key={status}
-
-                  radius="sm"
-
-                  p={6}
-
-                  style={{
-
-                    background:
-                      statusConfig[status]?.bg || "#fff",
-
-                    border:"none"
-
-                  }}
+                  mb={5}
 
                 >
 
 
-
-                  <Group
-
-                    justify="space-between"
-
-                  >
-
-
-                    <Group gap={5}>
-
-
-                      {statusConfig[status]?.icon}
-
-
-
-                      <Text
-
-                        fw={600}
-
-                        size="xs"
-
-                      >
-
-                        {
-                          statusConfig[status]?.label || status
-                        }
-
-                      </Text>
-
-
-                    </Group>
-
+                  <Group gap={5}>
 
 
                     <Badge
 
-                      size="xs"
+                      size="sm"
 
-                      color={
-                        statusConfig[status]?.color || "gray"
-                      }
+                      radius="xl"
 
                       variant="light"
 
+                      color="blue"
+
+                      p={5}
+
                     >
 
-                      {statusData.total}
+                      <IconMapPin size={14} />
 
                     </Badge>
+
+
+
+                    <Text
+
+                      fw={700}
+
+                      size="md"
+
+                    >
+
+                      حي {block}
+
+                    </Text>
 
 
                   </Group>
 
 
 
+                  <Badge
+
+                    size="md"
+
+                    radius="xl"
+
+                    variant="filled"
+
+                    color="blue"
+
+                  >
+
+                    {blockData.total}
+
+                  </Badge>
+
+
+                </Group>
+
+
+
+
+                <Stack gap={4}>
 
 
                   {
-                    !summaryOnlyStatuses.includes(status)
-                    &&
+                    Object.entries(blockData.statuses || {})
+                      .map(([status, statusData]) => (
 
 
-                    <Stack
+                        <Card
 
-                      mt={5}
+                          key={status}
 
-                      gap={4}
+                          radius="sm"
 
-                    >
+                          p={6}
 
+                          style={{
 
-                      {
-                        Object.entries(statusData.users || {})
-                          .map(([user, count]) => (
+                            background:
+                              statusConfig[status]?.bg || "#fff",
 
+                            border: "none"
 
-                            <Group
+                          }}
 
-                              key={user}
-
-                              justify="space-between"
-
-                              p={4}
-
-                              style={{
-
-                                background:
-                                  "rgba(255,255,255,.7)",
-
-                                borderRadius:6
-
-                              }}
-
-                            >
-
-
-                              <Group gap={5}>
-
-
-                                <Avatar
-
-                                  size="xs"
-
-                                  radius="xl"
-
-                                  color="blue"
-
-                                  variant="light"
-
-                                >
-
-                                  <IconUser size={11}/>
-
-                                </Avatar>
+                        >
 
 
 
-                                <Text
+                          <Group
 
-                                  size="10px"
+                            justify="space-between"
 
-                                  fw={700}
-
-                                  style={{
-
-                                    cursor:"pointer"
-
-                                  }}
-
-                                  onClick={() => {
-
-                                    setSelectedUser({
-
-                                      name:user,
-
-                                      ids:count.ids
-
-                                    });
+                          >
 
 
-                                    setOpened(true);
-
-                                  }}
-
-                                >
-
-                                  {user}
-
-                                </Text>
+                            <Group gap={5}>
 
 
-                              </Group>
+                              {statusConfig[status]?.icon}
 
 
 
+                              <Text
 
-                              <Badge
+                                fw={600}
 
                                 size="xs"
 
-                                variant="outline"
-
                               >
 
-                                {count.count}
+                                {
+                                  statusConfig[status]?.label || status
+                                }
 
-                              </Badge>
+                              </Text>
 
 
                             </Group>
 
 
-                          ))
-                      }
+
+                            <Badge
+
+                              size="xs"
+
+                              color={
+                                statusConfig[status]?.color || "gray"
+                              }
+
+                              variant="light"
+
+                            >
+
+                              {statusData.total}
+
+                            </Badge>
 
 
-                    </Stack>
+                          </Group>
 
+
+
+
+
+                          {
+                            !summaryOnlyStatuses.includes(status)
+                            &&
+
+
+                            <Stack
+
+                              mt={5}
+
+                              gap={4}
+
+                            >
+
+
+                              {
+                                Object.entries(statusData.users || {})
+                                  .map(([user, count]) => (
+
+
+                                    <Group
+
+                                      key={user}
+
+                                      justify="space-between"
+
+                                      p={4}
+
+                                      style={{
+
+                                        background:
+                                          "rgba(255,255,255,.7)",
+
+                                        borderRadius: 6
+
+                                      }}
+
+                                    >
+
+
+                                      <Group gap={5}>
+
+
+                                        <Avatar
+
+                                          size="xs"
+
+                                          radius="xl"
+
+                                          color="blue"
+
+                                          variant="light"
+
+                                        >
+
+                                          <IconUser size={11} />
+
+                                        </Avatar>
+
+
+
+                                        <Text
+
+                                          size="10px"
+
+                                          fw={700}
+
+                                          style={{
+
+                                            cursor: "pointer"
+
+                                          }}
+
+                                          onClick={() => {
+
+                                            setSelectedUser({
+
+                                              name: user,
+
+                                              ids: count.ids
+
+                                            });
+
+
+                                            setOpened(true);
+
+                                          }}
+
+                                        >
+
+                                          {user}
+
+                                        </Text>
+
+
+                                      </Group>
+
+
+
+
+                                      <Badge
+
+                                        size="xs"
+
+                                        variant="outline"
+
+                                      >
+
+                                        {count.count}
+
+                                      </Badge>
+
+
+                                    </Group>
+
+
+                                  ))
+                              }
+
+
+                            </Stack>
+
+                          }
+
+
+
+                        </Card>
+
+
+                      ))
                   }
 
 
-
-                </Card>
-
-
-              ))
-          }
+                </Stack>
 
 
-        </Stack>
+              </Card>
 
 
-      </Card>
-
-
-    ))
-}
+            ))
+        }
 
 
 
