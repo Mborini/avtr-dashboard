@@ -165,7 +165,7 @@ return {
 
   status:item.status,
 
-
+  kpiNameAr: details.kpiNameAr,
   userName:
     lastActivity?.userName || "غير معروف",
 

@@ -1,17 +1,18 @@
 "use client";
 
+import { useMemo } from "react";
 
 import {
   Box,
   Card,
   Group,
   Text,
-  Stack
+  Stack,
+  SimpleGrid,
+  Badge
 } from "@mantine/core";
 
-
 import DistrictCard from "./DistrictCard";
-
 
 import {
   statusConfig,
@@ -21,51 +22,699 @@ import {
 
 
 
-
 export default function FailureStats({
-  items=[]
-}){
+  items = []
+}) {
 
 
 
-const stats={};
+  // ==================================
+  // تجميع المناطق والمستخدمين
+  // ==================================
+
+  const stats = useMemo(() => {
+
+
+    const result = {};
+
+
+
+    items.forEach(item => {
+
+
+      const district =
+        item.districtName || "غير معروف";
+
+
+      const block =
+        item.blockName || "غير معروف";
+
+
+      const status =
+        item.status || "Unknown";
+
+
+
+      let lastUser = null;
+
+
+
+      if (
+        !summaryOnlyStatuses.includes(status) &&
+        item.activities?.length
+      ) {
+
+        lastUser =
+          item.activities.at(-1)?.userName ||
+          "Unknown";
+
+      }
 
 
 
 
-// ================================
-// تجميع البيانات
-// ================================
 
-items.forEach(item=>{
+      if (!result[district]) {
 
+        result[district] = {
 
-const district =
-item.districtName || "غير معروف";
+          total: 0,
 
+          blocks: {}
 
-const block =
-item.blockName || "غير معروف";
+        };
 
-
-const status =
-item.status || "Unknown";
+      }
 
 
 
-let lastUser=null;
+      result[district].total++;
 
 
 
-if(
-  !summaryOnlyStatuses.includes(status)
-  &&
-  item.activities?.length
-){
 
-  lastUser =
-    item.activities.at(-1)?.userName ||
-    "Unknown";
+
+      if (!result[district].blocks[block]) {
+
+        result[district].blocks[block] = {
+
+          total: 0,
+
+          statuses: {}
+
+        };
+
+      }
+
+
+
+      const blockData =
+        result[district].blocks[block];
+
+
+
+      blockData.total++;
+
+
+
+
+
+      if (!blockData.statuses[status]) {
+
+        blockData.statuses[status] = {
+
+          total: 0,
+
+          users: {}
+
+        };
+
+      }
+
+
+
+      blockData.statuses[status].total++;
+
+
+
+
+
+      if (lastUser) {
+
+
+        if (
+          !blockData.statuses[status]
+            .users[lastUser]
+        ) {
+
+          blockData.statuses[status]
+            .users[lastUser] = {
+
+            count: 0,
+
+            ids: []
+
+          };
+
+        }
+
+
+
+
+        blockData.statuses[status]
+          .users[lastUser]
+          .count++;
+
+
+
+
+        if (
+          !blockData.statuses[status]
+            .users[lastUser]
+            .ids.includes(item.id)
+        ) {
+
+          blockData.statuses[status]
+            .users[lastUser]
+            .ids.push(item.id);
+
+        }
+
+
+
+      }
+
+
+    });
+
+
+
+    return result;
+
+
+  }, [items]);
+
+
+
+
+
+
+
+  // ==================================
+  // الحالات العامة
+  // ==================================
+
+  const totalStatuses = useMemo(() => {
+
+
+    const result = {};
+
+
+
+    Object.keys(statusConfig)
+      .forEach(status => {
+
+        result[status] = 0;
+
+      });
+
+
+
+
+
+    items.forEach(item => {
+
+
+      const status =
+        item.status || "Unknown";
+
+
+
+      result[status] =
+        (result[status] || 0) + 1;
+
+
+    });
+
+
+
+    return result;
+
+
+  }, [items]);
+
+
+
+
+
+
+
+  // ==================================
+  // KPI
+  // ==================================
+
+  const kpis = useMemo(() => {
+
+
+    const total =
+      items.length;
+
+
+
+    const field =
+      totalStatuses
+        .PendingFieldMonitorVerification || 0;
+
+
+
+    const resolved =
+      totalStatuses.Resolved || 0;
+
+
+
+
+
+    return {
+
+
+      total,
+
+
+      fieldPercentage:
+        total
+          ?
+          ((field / total) * 100)
+            .toFixed(1)
+          :
+          0,
+
+
+
+      resolvedPercentage:
+        total
+          ?
+          ((resolved / total) * 100)
+            .toFixed(1)
+          :
+          0
+
+
+    };
+
+
+  }, [
+    items,
+    totalStatuses
+  ]);
+
+
+
+
+
+
+  const achievement =
+    (
+      (
+        Number(kpis.fieldPercentage) +
+        Number(kpis.resolvedPercentage)
+      )
+
+    )
+      .toFixed(1);
+
+
+
+
+
+
+
+  return (
+
+
+    <Box
+
+      p={{ base: "sm", md: "lg" }}
+
+      style={{
+
+        background: "#f8fafc",
+
+        minHeight: "100vh"
+
+      }}
+
+    >
+
+
+
+      <Stack gap="lg">
+
+
+
+
+
+
+
+        {/* ============================
+      SUMMARY HEADER
+============================ */}
+
+
+
+        <Card
+
+          radius="30"
+
+          p="xl"
+
+          withBorder
+
+          style={{
+
+            background: "#ffffff",
+
+            boxShadow:
+              "0 10px 30px rgba(0,0,0,.05)"
+
+          }}
+
+        >
+
+
+
+          <Stack gap="xl">
+
+
+
+
+
+            <Text
+
+              ta="center"
+
+              size="xl"
+
+              fw={900}
+
+            >
+
+              ملخص المخالفات لجميع المناطق
+            </Text>
+
+
+
+
+
+
+
+            <Box
+
+              style={{
+
+                textAlign: "center"
+
+              }}
+
+            >
+
+
+
+              <Text
+
+                fw={900}
+
+                size="64px"
+
+                c="#228be6"
+
+              >
+
+                {achievement}%
+
+              </Text>
+
+
+
+              <Text
+
+                fw={700}
+
+                c="dimmed"
+
+              >
+
+                نسبة الإنجاز الكلي
+
+              </Text>
+
+
+
+            </Box>
+
+
+
+
+
+
+
+
+
+            <SimpleGrid
+
+              cols={{
+
+                base: 1,
+
+                sm: 3
+
+              }}
+
+              spacing="md"
+
+            >
+
+
+
+              <MiniStat
+
+                title="الاجمالي الكلي "
+
+                value={kpis.total}
+
+              />
+
+
+
+              <MiniStat
+
+                title="نسبة التحقق الميداني"
+
+                value={`${kpis.fieldPercentage}%`}
+
+              />
+
+
+
+              <MiniStat
+
+                title="نسبة تم الحل"
+
+                value={`${kpis.resolvedPercentage}%`}
+
+              />
+
+
+
+            </SimpleGrid>
+
+
+
+
+
+
+
+            {/* الحالات */}
+
+
+
+            <Card
+
+              radius="24"
+
+              p="lg"
+
+              style={{
+
+                background: "#f8f9fa",
+
+                display: "flex",
+
+                flexDirection: "column",
+
+                alignItems: "center",
+
+                gap: "md"
+
+              }}
+
+            >
+
+
+              <Text
+
+                fw={900}
+                pb={10}
+                size="sm"
+
+              >
+
+                توزيع الأعداد حسب الحالة</Text>
+
+
+
+
+
+              <Group
+
+                gap="sm"
+
+                justify="center"
+
+                wrap="wrap"
+
+              >
+
+
+                {
+
+                  Object.entries(totalStatuses)
+
+                    .map(([status, count]) => (
+
+
+                      <Badge
+
+                        key={status}
+
+                        radius="xl"
+
+                        px="md"
+
+                        py={10}
+
+                        size="lg"
+
+                        variant="light"
+
+                        color={
+                          statusConfig[status]?.color || "gray"
+                        }
+
+                      >
+
+
+                        <Group
+
+                          gap={8}
+
+                          wrap="nowrap"
+
+                        >
+
+
+                          <Text
+
+                            size="xs"
+
+                            fw={700}
+
+                          >
+
+                            {
+                              statusConfig[status]?.label || status
+                            }
+
+                          </Text>
+
+
+
+
+
+
+
+                          {count}
+
+
+
+
+                        </Group>
+
+
+                      </Badge>
+
+
+                    ))
+
+
+                }
+
+
+
+              </Group>
+
+
+
+            </Card>
+
+
+
+
+
+
+
+          </Stack>
+
+
+        </Card>
+
+
+
+
+
+
+
+
+
+        {/* ============================
+      DISTRICTS
+============================ */}
+
+
+
+        <Stack gap="md">
+
+
+          {
+
+            Object.entries(stats)
+
+              .map(([district, data]) => (
+
+
+                <DistrictCard
+
+                  key={district}
+
+                  district={district}
+
+                  data={data}
+
+                />
+
+
+              ))
+
+
+          }
+
+
+
+        </Stack>
+
+
+
+
+
+      </Stack>
+
+
+
+    </Box>
+
+
+  );
+
+
 
 }
 
@@ -73,483 +722,72 @@ if(
 
 
 
-if(!stats[district]){
 
-  stats[district]={
-    total:0,
-    blocks:{}
-  };
 
-}
 
 
+function MiniStat({
 
+  title,
 
-stats[district].total++;
+  value
 
+}) {
 
 
+  return (
 
+    <Box
 
+      style={{
 
-if(!stats[district].blocks[block]){
+        background: "#f8f9fa",
 
-  stats[district].blocks[block]={
+        borderRadius: "20px",
 
-    total:0,
+        padding: "18px",
 
-    statuses:{}
+        textAlign: "center"
 
-  };
+      }}
 
-}
+    >
 
 
+      <Text
 
+        size="xs"
 
+        fw={700}
 
-const blockData =
-stats[district].blocks[block];
+        c="dimmed"
 
+      >
 
+        {title}
 
+      </Text>
 
 
-blockData.total++;
 
+      <Text
 
+        size="30px"
 
+        fw={900}
 
+      >
 
-if(!blockData.statuses[status]){
+        {value}
 
-  blockData.statuses[status]={
+      </Text>
 
-    total:0,
 
-    users:{}
 
-  };
+    </Box>
 
-}
 
-
-
-
-blockData.statuses[status].total++;
-
-
-
-
-
-
-// ================================
-// المستخدمين
-// ================================
-
-if(lastUser){
-
-
-
-const users =
-blockData.statuses[status].users;
-
-
-
-if(!users[lastUser]){
-
-  users[lastUser]={
-
-    count:0,
-
-    ids:[]
-
-  };
-
-}
-
-
-
-users[lastUser].count++;
-
-
-
-
-
-if(
- !users[lastUser].ids.includes(item.id)
-){
-
- users[lastUser].ids.push(
-   item.id
- );
-
-}
-
-
-
-}
-
-
-
-});
-
-
-
-
-
-
-
-// ================================
-// تجميع الحالات العامة
-// ================================
-
-
-const totalStatuses={};
-
-
-
-Object.keys(statusConfig)
-.forEach(status=>{
-
-  totalStatuses[status]=0;
-
-});
-
-
-
-
-items.forEach(item=>{
-
-
-const status =
-item.status || "Unknown";
-
-
-
-if(
- totalStatuses[status] !== undefined
-){
-
- totalStatuses[status]++;
-
-}
-else{
-
- totalStatuses[status]=1;
-
-}
-
-
-});
-
-
-
-
-
-
-
-
-return (
-
-
-<Box
-
-p="md"
-
-style={{
-
-background:"#f8fafc",
-
-minHeight:"100vh"
-
-}}
-
->
-
-
-<Stack gap="md">
-
-
-
-
-
-{/* ===========================
-      الإحصائيات العامة
-=========================== */}
-
-
-
-<Card
-
-radius="xl"
-
-p="lg"
-
-style={{
-
-background:
-"linear-gradient(135deg,#ff6b6b,#ff8787)"
-
-}}
-
->
-
-
-
-<Stack
-
-align="center"
-
-gap="md"
-
->
-
-
-
-<Text
-
-size="md"
-
-fw={900}
-
-c="white"
-
->
-
-إحصائيات المخالفات لجميع المناطق
-
-</Text>
-
-
-
-
-
-
-<Group
-
-justify="center"
-
-gap="md"
-
-wrap="wrap"
-
->
-
-
-
-
-
-{/* الكلي */}
-
-
-
-<Card
-
-radius="xl"
-
-p="md"
-
-style={{
-
-minWidth:130,
-
-textAlign:"center",
-
-background:
-"rgba(255,255,255,.25)",
-
-border:
-"1px solid rgba(255,255,255,.3)"
-
-}}
-
->
-
-
-<Text
-
-size="xs"
-
-fw={700}
-
-c="white"
-
->
-
-الكلي
-
-</Text>
-
-
-
-<Text
-
-size="32px"
-
-fw={900}
-
-c="white"
-
->
-
-{items.length}
-
-</Text>
-
-
-
-</Card>
-
-
-
-
-
-
-
-{/* الحالات */}
-
-
-
-{
-
-Object.entries(totalStatuses)
-
-.map(([status,count])=>(
-
-
-
-<Card
-
-key={status}
-
-radius="xl"
-
-p="md"
-
-style={{
-
-minWidth:130,
-
-textAlign:"center",
-
-background:
-"rgba(255,255,255,.18)",
-
-border:
-"1px solid rgba(255,255,255,.3)"
-
-}}
-
->
-
-
-
-
-<Text
-
-size="xs"
-
-fw={700}
-
-c="white"
-
->
-
-{
-statusConfig[status]?.label || status
-}
-
-</Text>
-
-
-
-
-<Text
-
-size="32px"
-
-fw={900}
-
-c="white"
-
->
-
-{count}
-
-</Text>
-
-
-
-
-</Card>
-
-
-
-))
-
-}
-
-
-
-
-</Group>
-
-
-
-</Stack>
-
-
-
-</Card>
-
-
-
-
-
-
-
-
-{/* ===========================
-      المناطق
-=========================== */}
-
-
-
-{
-
-Object.entries(stats)
-
-.map(([district,data])=>(
-
-
-<DistrictCard
-
-key={district}
-
-district={district}
-
-data={data}
-
-/>
-
-
-))
-
-
-}
-
-
-
-
-
-</Stack>
-
-
-</Box>
-
-
-);
+  );
 
 
 }

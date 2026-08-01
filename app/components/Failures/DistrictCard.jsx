@@ -13,11 +13,14 @@ import {
   Avatar,
   Modal,
   Button,
+  Box,
 } from "@mantine/core";
 
 
 import {
   IconBuildings,
+  IconEye,
+  IconLiveView,
   IconMapPin,
   IconUser,
 } from "@tabler/icons-react";
@@ -37,17 +40,17 @@ export default function DistrictCard({
 }) {
 
 
-  const [opened,setOpened] = useState(false);
+  const [opened, setOpened] = useState(false);
 
-  const [selectedUser,setSelectedUser] = useState(null);
+  const [selectedUser, setSelectedUser] = useState(null);
 
 
   // Modal ملخص الحالات
-  const [summaryModalOpened,setSummaryModalOpened] = useState(false);
+  const [summaryModalOpened, setSummaryModalOpened] = useState(false);
 
 
   // Modal ملخص المستخدمين
-  const [usersModalOpened,setUsersModalOpened] = useState(false);
+  const [usersModalOpened, setUsersModalOpened] = useState(false);
 
   // ==================================
   // تجميع الحالات لكل منطقة
@@ -55,75 +58,75 @@ export default function DistrictCard({
 
   const districtStatuses = {};
 
-// ==================================
-// تجميع المستخدمين حسب الحالة
-// ==================================
+  // ==================================
+  // تجميع المستخدمين حسب الحالة
+  // ==================================
 
-const districtUsersByStatus = {};
-
-
-
-Object.values(data.blocks || {})
-.forEach((block)=>{
-
-
-  Object.entries(block.statuses || {})
-  .forEach(([status,statusData])=>{
-
-
-    if(
-      !districtUsersByStatus[status]
-    ){
-
-      districtUsersByStatus[status] = {};
-
-    }
+  const districtUsersByStatus = {};
 
 
 
-    Object.entries(
-      statusData.users || {}
-    )
-    .forEach(([user,userData])=>{
+  Object.values(data.blocks || {})
+    .forEach((block) => {
 
 
-      if(
-        !districtUsersByStatus[status][user]
-      ){
-
-        districtUsersByStatus[status][user] = {
-          count:0,
-          ids:[]
-        };
-
-      }
+      Object.entries(block.statuses || {})
+        .forEach(([status, statusData]) => {
 
 
+          if (
+            !districtUsersByStatus[status]
+          ) {
 
-      districtUsersByStatus[status][user].count 
-      += userData.count;
+            districtUsersByStatus[status] = {};
+
+          }
 
 
 
-      districtUsersByStatus[status][user].ids
-      =
-      [
-        ...districtUsersByStatus[status][user].ids,
-        ...(userData.ids || [])
-      ];
+          Object.entries(
+            statusData.users || {}
+          )
+            .forEach(([user, userData]) => {
+
+
+              if (
+                !districtUsersByStatus[status][user]
+              ) {
+
+                districtUsersByStatus[status][user] = {
+                  count: 0,
+                  ids: []
+                };
+
+              }
+
+
+
+              districtUsersByStatus[status][user].count
+                += userData.count;
+
+
+
+              districtUsersByStatus[status][user].ids
+                =
+                [
+                  ...districtUsersByStatus[status][user].ids,
+                  ...(userData.ids || [])
+                ];
+
+
+
+            });
+
+
+
+        });
 
 
 
     });
-
-
-
-  });
-
-
-
-});
-  Object.keys(statusConfig).forEach((status)=>{
+  Object.keys(statusConfig).forEach((status) => {
 
     districtStatuses[status] = 0;
 
@@ -132,1033 +135,1305 @@ Object.values(data.blocks || {})
 
 
   Object.values(data.blocks || {})
-  .forEach((block)=>{
+    .forEach((block) => {
 
 
-    Object.entries(block.statuses || {})
-    .forEach(([status,statusData])=>{
+      Object.entries(block.statuses || {})
+        .forEach(([status, statusData]) => {
 
 
-      if(districtStatuses[status] === undefined){
+          if (districtStatuses[status] === undefined) {
 
-        districtStatuses[status] = 0;
+            districtStatuses[status] = 0;
 
-      }
+          }
 
 
-      districtStatuses[status] += statusData.total;
+          districtStatuses[status] += statusData.total;
+
+
+        });
 
 
     });
 
 
-  });
 
+  const usersByStatus = {};
 
-
-const usersByStatus = {};
-
-Object.keys(statusConfig).forEach((status) => {
-  usersByStatus[status] = {};
-});
-
-Object.values(data.blocks || {}).forEach((block) => {
-
-  Object.entries(block.statuses || {}).forEach(([status, statusData]) => {
-
-    if (summaryOnlyStatuses.includes(status)) return;
-
-    Object.entries(statusData.users || {}).forEach(([user, userData]) => {
-
-
-  if (!usersByStatus[status]) {
+  Object.keys(statusConfig).forEach((status) => {
     usersByStatus[status] = {};
-  }
-
-
-  if (!usersByStatus[status][user]) {
-    usersByStatus[status][user] = 0;
-  }
-
-
-  usersByStatus[status][user] += userData.count;
-
-
-});
-
   });
 
-});
+  Object.values(data.blocks || {}).forEach((block) => {
 
+    Object.entries(block.statuses || {}).forEach(([status, statusData]) => {
 
-return (
+      if (summaryOnlyStatuses.includes(status)) return;
 
-<Card
+      Object.entries(statusData.users || {}).forEach(([user, userData]) => {
 
-radius="xl"
 
-p="md"
+        if (!usersByStatus[status]) {
+          usersByStatus[status] = {};
+        }
 
-shadow="xs"
 
-style={{
+        if (!usersByStatus[status][user]) {
+          usersByStatus[status][user] = 0;
+        }
 
-background:"#fff",
 
-border:"1px solid #edf2f7",
+        usersByStatus[status][user] += userData.count;
 
-}}
 
->
+      });
 
+    });
 
+  });
+  const districtColors = {
 
-{/* ================= HEADER ================= */}
+    "طارق": {
+      main: "#228be6",
+      light: "#e7f5ff"
+    },
 
+    "الجبيهة": {
+      main: "#099268",
+      light: "#ebfbee"
+    },
 
-<Group
+    "ابو نصير": {
+      main: "#fa5252",
+      light: "#ffe3e3"
+    },
 
-justify="space-between"
+    "شفا بدران": {
+      main: "#f59f00",
+      light: "#fff9db"
+    },
 
-align="center"
+    "ماركا": {
+      main: "#fa5252",
+      light: "#fff5f5"
+    },
 
-mb="xs"
-
->
-
-
-
-<Group gap="sm">
-
-
-<Badge
-
-size="xl"
-
-radius="xl"
-
-variant="light"
-
-color="blue"
-
-p={8}
-
->
-
-<IconBuildings size={20}/>
-
-</Badge>
-
-
-
-<Text
-
-fw={900}
-
-size="lg"
-
->
-منطقة 
-{" "}
-{district}
-
-</Text>
-
-
-
-</Group>
-
-<Group
-  justify="center"
-  mt="md"
-  mb="md"
->
-
-<Button
-  size="xs"
-  radius="xl"
-  variant="light"
-  onClick={() =>
-    setSummaryModalOpened(true)
-  }
->
-  ملخص حالات المخالفات حسب المنطقة
-</Button>
-
-
-<Button
-  size="xs"
-  radius="xl"
-  color="grape"
-  variant="light"
-  onClick={() =>
-    setUsersModalOpened(true)
-  }
->
-ملخص حالات المخالفات حسب المستخدمين
-
-</Button>
-
-
-</Group>
-
-
-<Group gap="xs">
-
-
-<Text
-
-size="sm"
-
-c="dimmed"
-
-fw={700}
-
->
-
-إجمالي المخالفات
-
-</Text>
-
-
-
-<Badge
-
-size="lg"
-
-radius="xl"
-
-variant="filled"
-
-color="blue"
-
->
-
-{data.total}
-
-</Badge>
-
-
-
-</Group>
-
-
-
-</Group>
-
-
-
-{/* ================= BLOCKS ================= */}
-
-
-
-<SimpleGrid
-
-cols={{
-
-base:1,
-
-sm:4,
-
-md:4
-
-}}
-
-spacing="sm"
-
->
-
-
-
-{
-
-Object.entries(data.blocks || {})
-
-.map(([block,blockData])=>(
-
-
-
-<Card
-
-key={block}
-
-radius="lg"
-
-p="sm"
-
-shadow="xs"
-
-style={{
-
-background:"#fafafa",
-
-border:"1px solid #f1f3f5"
-
-}}
-
->
-
-
-
-<Group
-
-justify="space-between"
-
-mb="xs"
-
->
-
-
-
-<Group gap="xs">
-
-
-<Badge
-
-size="lg"
-
-radius="xl"
-
-variant="light"
-
-color="blue"
-
-p={8}
-
->
-
-<IconMapPin size={18}/>
-
-</Badge>
-
-
-
-<Text
-
-fw={800}
-
-size="sm"
-
->
-حي 
-{" "}
-{block}
-
-</Text>
-
-
-</Group>
-
-
-
-
-<Badge
-
-size="lg"
-
-radius="xl"
-
-variant="filled"
-
-color="blue"
-
->
-
-{blockData.total}
-
-</Badge>
-
-
-
-</Group>
-
-
-
-
-
-
-
-<Stack gap="xs">
-
-
-{
-
-Object.entries(blockData.statuses || {})
-
-.map(([status,statusData])=>(
-
-
-
-<Card
-
-key={status}
-
-radius="md"
-
-p="xs"
-
-style={{
-
-background:
-
-statusConfig[status]?.bg || "#fff",
-
-border:"none"
-
-}}
-
->
-
-
-
-
-<Group
-
-justify="space-between"
-
->
-
-<Group gap={6}>
-
-
-{statusConfig[status]?.icon}
-
-
-
-<Text
-
-fw={600}
-
-size="sm"
-
->
-
-{
-
-statusConfig[status]?.label || status
-
-}
-
-</Text>
-
-
-</Group>
-
-
-
-<Badge
-
-size="sm"
-
-color={
-
-statusConfig[status]?.color || "gray"
-
-}
-
-variant="light"
-
->
-
-{statusData.total}
-
-</Badge>
-
-
-
-</Group>
-
-
-
-
-
-
-
-{
-
-!summaryOnlyStatuses.includes(status)
-
-&&
-
-
-<Stack
-
-mt="xs"
-
-gap={6}
-
->
-
-
-{
-
-Object.entries(statusData.users || {})
-
-.map(([user,count])=>(
-
-
-
-<Group
-
-key={user}
-
-justify="space-between"
-
-p={6}
-
-style={{
-
-background:"rgba(255,255,255,.7)",
-
-borderRadius:8
-
-}}
-
->
-
-
-
-<Group gap="xs">
-
-
-<Avatar
-
-size="sm"
-
-radius="xl"
-
-color="blue"
-
-variant="light"
-
->
-
-<IconUser size={14}/>
-
-</Avatar>
-
-
-
-
-
-<Text
-
-size="xs"
-
-fw={700}
-
-style={{
-
-cursor:"pointer"
-
-}}
-
-onClick={()=>{
-
-
-setSelectedUser({
-
-name:user,
-
-ids:count.ids
-
-});
-
-
-setOpened(true);
-
-
-}}
-
->
-
-{user}
-
-</Text>
-
-
-
-</Group>
-
-
-
-
-
-<Badge
-
-size="sm"
-
-variant="outline"
-
->
-
-{count.count}
-
-</Badge>
-
-
-
-
-</Group>
-
-
-
-))
-
-}
-
-
-</Stack>
-
-
-}
-
-
-
-</Card>
-
-
-
-))
-
-}
-
-
-
-</Stack>
-
-
-
-
-
-</Card>
-
-
-
-))
-
-}
-
-
-
-</SimpleGrid>
-
-
-
-
-
-{/* ================= USER MODAL ================= */}
-
-
-<Modal
-  dir="rtl"
-  opened={opened}
-  onClose={()=>setOpened(false)}
-  title={
-    selectedUser
-      ?
-      `قائمة المخالفات التي قام ${selectedUser.name} بإجراء عليها`
-      :
-      ""
-  }
-  centered
-
-  styles={{
-    title:{
-      fontSize:"14px",
-      fontWeight:700,
+    "المدينة": {
+      main: "#15aabf",
+      light: "#e3fafc"
     }
+
+  };
+
+  const districtTotal =
+    data.total || 0;
+
+
+  const fieldCount =
+    districtStatuses.PendingFieldMonitorVerification || 0;
+
+
+  const resolvedCount =
+    districtStatuses.Resolved || 0;
+
+
+
+  const fieldPercentage =
+    districtTotal
+      ? ((fieldCount / districtTotal) * 100).toFixed(1)
+      : 0;
+
+
+
+  const resolvedPercentage =
+    districtTotal
+      ? ((resolvedCount / districtTotal) * 100).toFixed(1)
+      : 0;
+
+
+
+  const achievement =
+    (
+      Number(fieldPercentage) +
+      Number(resolvedPercentage)
+    ).toFixed(1);
+
+  const districtTheme =
+    districtColors[district] || {
+      main: "#868e96",
+      light: "#f1f3f5"
+    };
+  return (
+
+    <Card
+
+      radius="xl"
+
+      p="md"
+
+      shadow="xs"
+
+
+    >
+
+
+
+      {/* ================= HEADER ================= */}
+
+
+  <Group
+  justify="space-between"
+  align="center"
+  mb="xs"
+  style={{
+    position: "relative",
+    minHeight: 50,
   }}
 >
 
+  {/* اسم المنطقة بالمنتصف الحقيقي */}
+  <Group
+    gap="sm"
+    style={{
+      position: "absolute",
+      left: "50%",
+      transform: "translateX(-50%)",
+      width: "max-content",
+      maxWidth: "70%",
+    }}
+  >
 
-<Stack>
-
-
-<Text
-  size="sm"
-  c="dimmed"
-  fw={700}
->
-عدد المخالفات: {selectedUser?.ids?.length || 0}
-</Text>
-
-
-
-{
-selectedUser?.ids?.map((id,index)=>(
-
-
-<Card
-
-key={`${id}-${index}`}
-
-withBorder
-
-radius="md"
-
-p="sm"
-
->
+    <Badge
+      size="xl"
+      radius="xl"
+      variant="filled"
+      p={8}
+      style={{
+        background: districtTheme.main,
+        flexShrink: 0,
+      }}
+    >
+      <IconBuildings size={20} />
+    </Badge>
 
 
-<Group
+    <Text
+      fw={900}
+      c={districtTheme.main}
+      ta="center"
+      style={{
+        fontSize: "clamp(20px, 4vw, 32px)",
+        lineHeight: 1.1,
+        letterSpacing: "-0.5px",
+        whiteSpace: "nowrap",
+        overflow: "hidden",
+        textOverflow: "ellipsis",
+      }}
+    >
+      منطقة {district}
+    </Text>
 
-justify="space-between"
-
->
+  </Group>
 
 
-<Text
-
-fw={700}
-
->
-
-رقم المخالفة
-
-</Text>
-
-
-
-<Badge
-
-size="lg"
-
-variant="light"
-
-color="blue"
-
->
-
-{id}
-
-</Badge>
-
+  {/* الزر يمين */}
+  <Button
+    size="xs"
+    radius="xl"
+    color="grape"
+    variant="light"
+    onClick={() => setUsersModalOpened(true)}
+    leftSection={<IconEye size={16} />}
+    style={{
+      marginLeft: "auto",
+    }}
+  >
+    إنجاز المستخدمين
+  </Button>
 
 
 </Group>
+      <Card
+
+        radius="30"
+
+        p="lg"
+
+        mt="md"
+        mb={10}
+        withBorder
+
+        style={{
+
+          background: "#ffffff",
+
+          boxShadow:
+            "0 10px 30px rgba(0,0,0,.05)"
+
+        }}
+
+      >
+
+
+        <Stack gap="md">
+
+
+          <Box
+
+            style={{
+
+              textAlign: "center"
+
+            }}
+
+          >
 
 
 
-</Card>
+            <Text
+
+              ta="center"
+
+              fw={900}
+
+              size="48px"
+
+              c={districtTheme.main}
+
+            >
+
+              {achievement}%
+
+            </Text>
 
 
 
-))
+            <Text
 
-}
+              fw={700}
 
+              c="dimmed"
 
+            >
 
-</Stack>
+              نسبة الإنجاز الكلي
 
-
-
-</Modal>
-
-
-
-<Modal
-  dir="rtl"
-  opened={summaryModalOpened}
-  onClose={() => setSummaryModalOpened(false)}
-  centered
-  size="lg"
-  title="ملخص حالات المخالفات حسب المنطقة"
-  styles={{
-    title:{
-      fontSize:"15px",
-      fontWeight:800
-    }
-  }}
->
+            </Text>
 
 
-<SimpleGrid
-  cols={{
-    base:1,
-    sm:3
-  }}
-  spacing="sm"
->
+
+          </Box>
+
+
+
+
+
+
+          <SimpleGrid
+
+            cols={{
+
+              base: 1,
+
+              sm: 3
+
+            }}
+
+            spacing="sm"
+
+          >
+
+
+            <BoxStat
+
+              title="الاجمالي الكلي"
+
+              value={districtTotal}
+
+            />
+
+
+            <BoxStat
+
+              title="نسبة التحقق الميداني"
+
+              value={`${fieldPercentage}%`}
+
+            />
+
+
+            <BoxStat
+
+              title="نسبة تم الحل"
+
+              value={`${resolvedPercentage}%`}
+
+            />
+
+
+          </SimpleGrid>
+
+
+        </Stack>
+        <Card
+
+          radius="24"
+
+          p="lg"
+
+          mt="md"
+          mb="md"
+          style={{
+
+            background: "#f8f9fa",
+
+            display: "flex",
+
+            flexDirection: "column",
+
+            alignItems: "center",
+
+            gap: "md"
+
+          }}
+
+        >
+
+
+          <Text
+
+            fw={900}
+            mb={10}
+            size="lg"
+
+          >
+
+            توزيع الأعداد حسب الحالة
+
+          </Text>
+
+
+
+          <Group
+
+            gap="sm"
+
+            justify="center"
+
+            wrap="wrap"
+
+          >
+
+
+            {
+
+              Object.entries(districtStatuses)
+
+                .map(([status, count]) => (
+
+
+                  <Badge
+
+                    key={status}
+
+                    radius="xl"
+
+                    px="md"
+
+                    py={10}
+
+                    size="lg"
+
+                    variant="light"
+
+                    color={
+                      statusConfig[status]?.color || "gray"
+                    }
+
+                  >
+
+
+                    <Group
+
+                      gap={8}
+
+                      wrap="nowrap"
+
+                    >
+
+
+                      <Text
+
+                        size="xs"
+
+                        fw={700}
+
+                      >
+
+                        {
+                          statusConfig[status]?.label || status
+                        }
+
+                      </Text>
+
+
+                      {count}
+
+
+                    </Group>
+
+
+                  </Badge>
+
+
+                ))
+
+            }
+
+
+          </Group>
+
+
+        </Card>
+
+      </Card>
+
+      {/* ================= BLOCKS ================= */}
+
+
+      {/* ================= STATUS SUMMARY ================= */}
+
+
+
+      <SimpleGrid
+
+        cols={{
+
+          base: 1,
+
+          sm: 4,
+
+          md: 5
+
+        }}
+
+        spacing="xs"
+
+      >
 
 
 {
-Object.entries(districtStatuses)
-.map(([status,count])=>(
+  Object.entries(data.blocks || {})
+    .map(([block, blockData]) => (
+
+      <Card
+
+        key={block}
+
+        radius="md"
+
+        p="xs"
+
+        shadow="xs"
+
+        style={{
+
+          background:
+            "rgba(255,255,255,0.45)",
+
+          backdropFilter:
+            "blur(14px)",
+
+          WebkitBackdropFilter:
+            "blur(14px)",
+
+          border:
+            "1px solid rgba(255,255,255,0.6)",
+
+          boxShadow:
+            "0 8px 30px rgba(0,0,0,0.08)"
+
+        }}
+
+      >
 
 
-<Card
+        {/* HEADER BLOCK */}
 
-key={status}
+        <Group
 
-radius="lg"
+          justify="space-between"
 
-p="md"
+          mb={5}
 
-style={{
-
-textAlign:"center",
-
-background:
-statusConfig[status]?.bg || "#fff",
-
-border:"1px solid #edf2f7"
-
-}}
-
->
+        >
 
 
-<Text
+          <Group gap={5}>
 
-size="sm"
 
-fw={700}
+            <Badge
 
-c="dimmed"
+              size="sm"
 
-mb={5}
+              radius="xl"
 
->
+              variant="light"
 
-{
-statusConfig[status]?.label || status
+              color="blue"
+
+              p={5}
+
+            >
+
+              <IconMapPin size={14} />
+
+            </Badge>
+
+
+
+            <Text
+
+              fw={700}
+
+              size="md"
+
+            >
+
+              حي {block}
+
+            </Text>
+
+
+          </Group>
+
+
+
+          <Badge
+
+            size="md"
+
+            radius="xl"
+
+            variant="filled"
+
+            color="blue"
+
+          >
+
+            {blockData.total}
+
+          </Badge>
+
+
+        </Group>
+
+
+
+
+        <Stack gap={4}>
+
+
+          {
+            Object.entries(blockData.statuses || {})
+              .map(([status, statusData]) => (
+
+
+                <Card
+
+                  key={status}
+
+                  radius="sm"
+
+                  p={6}
+
+                  style={{
+
+                    background:
+                      statusConfig[status]?.bg || "#fff",
+
+                    border:"none"
+
+                  }}
+
+                >
+
+
+
+                  <Group
+
+                    justify="space-between"
+
+                  >
+
+
+                    <Group gap={5}>
+
+
+                      {statusConfig[status]?.icon}
+
+
+
+                      <Text
+
+                        fw={600}
+
+                        size="xs"
+
+                      >
+
+                        {
+                          statusConfig[status]?.label || status
+                        }
+
+                      </Text>
+
+
+                    </Group>
+
+
+
+                    <Badge
+
+                      size="xs"
+
+                      color={
+                        statusConfig[status]?.color || "gray"
+                      }
+
+                      variant="light"
+
+                    >
+
+                      {statusData.total}
+
+                    </Badge>
+
+
+                  </Group>
+
+
+
+
+
+                  {
+                    !summaryOnlyStatuses.includes(status)
+                    &&
+
+
+                    <Stack
+
+                      mt={5}
+
+                      gap={4}
+
+                    >
+
+
+                      {
+                        Object.entries(statusData.users || {})
+                          .map(([user, count]) => (
+
+
+                            <Group
+
+                              key={user}
+
+                              justify="space-between"
+
+                              p={4}
+
+                              style={{
+
+                                background:
+                                  "rgba(255,255,255,.7)",
+
+                                borderRadius:6
+
+                              }}
+
+                            >
+
+
+                              <Group gap={5}>
+
+
+                                <Avatar
+
+                                  size="xs"
+
+                                  radius="xl"
+
+                                  color="blue"
+
+                                  variant="light"
+
+                                >
+
+                                  <IconUser size={11}/>
+
+                                </Avatar>
+
+
+
+                                <Text
+
+                                  size="10px"
+
+                                  fw={700}
+
+                                  style={{
+
+                                    cursor:"pointer"
+
+                                  }}
+
+                                  onClick={() => {
+
+                                    setSelectedUser({
+
+                                      name:user,
+
+                                      ids:count.ids
+
+                                    });
+
+
+                                    setOpened(true);
+
+                                  }}
+
+                                >
+
+                                  {user}
+
+                                </Text>
+
+
+                              </Group>
+
+
+
+
+                              <Badge
+
+                                size="xs"
+
+                                variant="outline"
+
+                              >
+
+                                {count.count}
+
+                              </Badge>
+
+
+                            </Group>
+
+
+                          ))
+                      }
+
+
+                    </Stack>
+
+                  }
+
+
+
+                </Card>
+
+
+              ))
+          }
+
+
+        </Stack>
+
+
+      </Card>
+
+
+    ))
 }
 
-</Text>
 
 
+      </SimpleGrid>
 
-<Text
 
-size="xl"
 
-fw={900}
 
->
 
-{count}
+      {/* ================= USER MODAL ================= */}
 
-</Text>
 
+      <Modal
+        dir="rtl"
+        opened={opened}
+        onClose={() => setOpened(false)}
+        title={
+          selectedUser
+            ?
+            `قائمة المخالفات التي قام ${selectedUser.name} بإجراء عليها`
+            :
+            ""
+        }
+        centered
 
+        styles={{
+          title: {
+            fontSize: "14px",
+            fontWeight: 700,
+          }
+        }}
+      >
 
-</Card>
 
+        <Stack>
 
-))
 
-}
+          <Text
+            size="sm"
+            c="dimmed"
+            fw={700}
+          >
+            عدد المخالفات: {selectedUser?.ids?.length || 0}
+          </Text>
 
 
 
-</SimpleGrid>
+          {
+            selectedUser?.ids?.map((id, index) => (
 
 
+              <Card
 
-</Modal><Modal
-  dir="rtl"
-  opened={usersModalOpened}
-  onClose={() => setUsersModalOpened(false)}
-  centered
-  size="lg"
-  title="ملخص حالات المخالفات حسب المستخدمين"
-  styles={{
-    title:{
-      fontSize:"15px",
-      fontWeight:800
-    }
-  }}
->
+                key={`${id}-${index}`}
 
+                withBorder
 
-<Stack gap="sm">
+                radius="md"
 
+                p="sm"
 
-{
-Object.entries(districtUsersByStatus)
-.map(([status,users])=>(
+              >
 
 
-<Card
+                <Group
 
-key={status}
+                  justify="space-between"
 
-radius="lg"
+                >
 
-p="md"
 
-style={{
+                  <Text
 
-background:
-statusConfig[status]?.bg || "#fff",
+                    fw={700}
 
-border:"1px solid #edf2f7"
+                  >
 
-}}
+                    رقم المخالفة
 
->
+                  </Text>
 
 
-<Group
-justify="space-between"
-mb="sm"
->
 
+                  <Badge
 
-<Text
+                    size="lg"
 
-fw={800}
+                    variant="light"
 
-size="sm"
+                    color="blue"
 
->
+                  >
 
-{
-statusConfig[status]?.label || status
-}
+                    {id}
 
-</Text>
+                  </Badge>
 
 
 
-<Badge
+                </Group>
 
-color={
-statusConfig[status]?.color || "gray"
-}
 
-variant="light"
 
->
+              </Card>
 
-{
-Object.values(users)
-.reduce(
-(sum,user)=>sum+user.count,
-0
-)
-}
 
-</Badge>
 
+            ))
 
-</Group>
+          }
 
 
 
+        </Stack>
 
 
-<Stack gap={6}>
 
+      </Modal>
 
-{
-Object.entries(users)
-.map(([user,userData])=>(
 
 
-<Group
+      <Modal
+        dir="rtl"
+        opened={summaryModalOpened}
+        onClose={() => setSummaryModalOpened(false)}
+        centered
+        size="lg"
+        title="ملخص حالات المخالفات حسب المنطقة"
+        styles={{
+          title: {
+            fontSize: "15px",
+            fontWeight: 800
+          }
+        }}
+      >
 
-key={user}
 
-justify="space-between"
+        <SimpleGrid
+          cols={{
+            base: 1,
+            sm: 3
+          }}
+          spacing="sm"
+        >
 
-p="xs"
 
-style={{
+          {
+            Object.entries(districtStatuses)
+              .map(([status, count]) => (
 
-background:"#ffffff",
 
-borderRadius:8
+                <Card
 
-}}
+                  key={status}
 
->
+                  radius="lg"
 
+                  p="md"
 
-<Group gap="xs">
+                  style={{
 
+                    textAlign: "center",
 
-<Avatar
+                    background:
+                      statusConfig[status]?.bg || "#fff",
 
-size="sm"
+                    border: "1px solid #edf2f7"
 
-color="blue"
+                  }}
 
-variant="light"
+                >
 
->
 
-{user.charAt(0)}
+                  <Text
 
-</Avatar>
+                    size="sm"
 
+                    fw={700}
 
+                    c="dimmed"
 
-<Text
+                    mb={5}
 
-size="sm"
+                  >
 
-fw={700}
+                    {
+                      statusConfig[status]?.label || status
+                    }
 
->
+                  </Text>
 
-{user}
 
-</Text>
 
+                  <Text
 
-</Group>
+                    size="xl"
 
+                    fw={900}
 
+                  >
 
+                    {count}
 
-<Badge
+                  </Text>
 
-variant="outline"
 
->
 
-{userData.count}
+                </Card>
 
-</Badge>
 
+              ))
 
+          }
 
-</Group>
 
 
-))
+        </SimpleGrid>
 
-}
 
 
-</Stack>
+      </Modal><Modal
+        dir="rtl"
+        opened={usersModalOpened}
+        onClose={() => setUsersModalOpened(false)}
+        centered
+        size="lg"
+        title="ملخص حالات المخالفات حسب المستخدمين"
+        styles={{
+          title: {
+            fontSize: "15px",
+            fontWeight: 800
+          }
+        }}
+      >
 
 
+        <Stack gap="sm">
 
-</Card>
 
+          {
+            Object.entries(districtUsersByStatus)
+              .map(([status, users]) => (
 
-))
 
+                <Card
 
-}
+                  key={status}
 
+                  radius="lg"
 
+                  p="md"
 
-</Stack>
+                  style={{
 
+                    background:
+                      statusConfig[status]?.bg || "#fff",
 
+                    border: "1px solid #edf2f7"
 
-</Modal>
+                  }}
 
-</Card>
+                >
 
 
-);
+                  <Group
+                    justify="space-between"
+                    mb="sm"
+                  >
 
 
+                    <Text
+
+                      fw={800}
+
+                      size="sm"
+
+                    >
+
+                      {
+                        statusConfig[status]?.label || status
+                      }
+
+                    </Text>
+
+
+
+                    <Badge
+
+                      color={
+                        statusConfig[status]?.color || "gray"
+                      }
+
+                      variant="light"
+
+                    >
+
+                      {
+                        Object.values(users)
+                          .reduce(
+                            (sum, user) => sum + user.count,
+                            0
+                          )
+                      }
+
+                    </Badge>
+
+
+                  </Group>
+
+
+
+
+
+                  <Stack gap={6}>
+
+
+                    {
+                      Object.entries(users)
+                        .map(([user, userData]) => (
+
+
+                          <Group
+
+                            key={user}
+
+                            justify="space-between"
+
+                            p="xs"
+
+                            style={{
+
+                              background: "#ffffff",
+
+                              borderRadius: 8
+
+                            }}
+
+                          >
+
+
+                            <Group gap="xs">
+
+
+                              <Avatar
+
+                                size="sm"
+
+                                color="blue"
+
+                                variant="light"
+
+                              >
+
+                                {user.charAt(0)}
+
+                              </Avatar>
+
+
+
+                              <Text
+
+                                size="sm"
+
+                                fw={700}
+
+                              >
+
+                                {user}
+
+                              </Text>
+
+
+                            </Group>
+
+
+
+
+                            <Badge
+
+                              variant="outline"
+
+                            >
+
+                              {userData.count}
+
+                            </Badge>
+
+
+
+                          </Group>
+
+
+                        ))
+
+                    }
+
+
+                  </Stack>
+
+
+
+                </Card>
+
+
+              ))
+
+
+          }
+
+
+
+        </Stack>
+
+
+
+      </Modal>
+
+    </Card>
+
+
+  );
+
+  function BoxStat({
+    title,
+    value
+  }) {
+
+    return (
+
+      <Card
+
+        radius="20"
+
+        p="md"
+
+        style={{
+
+          background: "#f8f9fa",
+
+          textAlign: "center"
+
+        }}
+
+      >
+
+
+        <Text
+
+          size="xs"
+
+          fw={700}
+
+          c="dimmed"
+
+        >
+
+          {title}
+
+        </Text>
+
+
+        <Text
+
+          size="28px"
+
+          fw={900}
+
+        >
+
+          {value}
+
+        </Text>
+
+
+      </Card>
+
+    );
+
+  }
 }
