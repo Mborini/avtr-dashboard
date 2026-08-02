@@ -10,8 +10,10 @@ import {
   Checkbox,
   Button,
   PasswordInput,
-  Divider
+  Divider,
+  ActionIcon
 } from "@mantine/core";
+import { IconFileSpreadsheet } from "@tabler/icons-react";
 
 import { useState } from "react";
 
@@ -112,71 +114,41 @@ const allowPayment =
   // Excel
   // =============================
 
-  const exportExcel = () => {
+const exportExcel = () => {
 
+  const exportItems =
+    selectedIds.length > 0
+      ? failures.filter(item => selectedIds.includes(item.id))
+      : failures;
 
-    const rows = failures
+  const rows = exportItems.map(item => ({
 
-    .filter(item =>
-      selectedIds.includes(item.id)
-    )
+    "رقم المخالفة": item.id,
 
-    .map(item => ({
+    "اسم المنطقة": item.district,
 
+    "اسم الحي": item.block
 
-      "رقم المخالفة":
-      item.id,
+  }));
 
+  const worksheet =
+    XLSX.utils.json_to_sheet(rows);
 
-      "اسم المنطقة":
-      item.district,
+  const workbook =
+    XLSX.utils.book_new();
 
+  XLSX.utils.book_append_sheet(
+    workbook,
+    worksheet,
+    "المخالفات"
+  );
 
-      "اسم الحي":
-      item.block
+  XLSX.writeFile(
+    workbook,
+    "المخالفات.xlsx"
+  );
 
-
-    }));
-
-
-
-
-    const worksheet =
-      XLSX.utils.json_to_sheet(rows);
-
-
-
-
-    const workbook =
-      XLSX.utils.book_new();
-
-
-
-
-    XLSX.utils.book_append_sheet(
-
-      workbook,
-
-      worksheet,
-
-      "المخالفات المسددة"
-
-    );
-
-
-
-
-    XLSX.writeFile(
-
-      workbook,
-
-      "المخالفات_المسددة.xlsx"
-
-    );
-
-
-  };
-
+};
 
 
 
@@ -359,248 +331,206 @@ const allowPayment =
 
 
       <Modal
+  opened={opened}
+  onClose={onClose}
+  title={
+    <Group justify="space-between" w="100%">
+      <Text fw={800} size="md">
+        {title}
+      </Text>
 
-        opened={opened}
-
-        onClose={onClose}
-
-        title={title}
-
-        centered
-
-        size="lg"
-
-        dir="rtl"
-
-      >
-
-
-        <Stack gap="md">
-
-
-
-          <Group justify="space-between">
-
-
-            <Text fw={800}>
-
-
-              عدد المخالفات:
-              {" "}
-              {failures.length}
-
-
-            </Text>
-
-
-
-           {
-allowPayment && (
-
-<Button
-
-  size="xs"
-
-  variant="light"
-
-  onClick={selectAll}
-
+     
+    </Group>
+  }
+  centered
+  size="sm"
+  radius="lg"
+  shadow="lg"
+  dir="rtl"
 >
 
-{
+  <Stack gap="sm">
 
-selectedIds.length === failures.length
 
-?
+    <Card
+      radius="md"
+      p="xs"
+      withBorder
+      style={{
+        background:"rgba(255,255,255,.6)",
+        backdropFilter:"blur(8px)"
+      }}
+    >
 
-"إلغاء الكل"
+      <Group justify="space-between">
 
-:
+        <Stack gap={4}>
 
-"تحديد الكل"
-
-}
-
-</Button>
-
-)
-}
-
-
-
-          </Group>
-
-
-
-
-
-          <Divider />
-
-
-
-
-
-          <Stack>
-
-
-
-            {
-
-failures.map((item,index) => (
-
-<Card
-
-  key={`${item.id}-${index}`}
-
-  withBorder
-
-  radius="md"
-
-  p="sm"
-
->
-
-
-
-                <Group
-
-                  justify="space-between"
-
-                >
-
-{
-allowPayment && (
-
-<Checkbox
-
-  checked={
-    selectedIds.includes(item.id)
-  }
-
-  onChange={() =>
-    toggleSelect(item.id)
-  }
-
-/>
-
-)
-}
-
-
-
-
-
-                  <Stack
-
-                    gap={3}
-
-                    align="flex-end"
-
-                  >
-
-
-
-                    <Badge
-
-                      size="lg"
-
-                      color="blue"
-
-                      variant="light"
-
-                    >
-
-                      {item.id}
-
-                    </Badge>
-
-
-
-
-                    <Text
-
-                      size="xs"
-
-                      c="dimmed"
-
-                      fw={700}
-
-                    >
-
-                      {item.district}
-
-                      {" - "}
-
-                      {item.block}
-
-
-                    </Text>
-
-
-
-                  </Stack>
-
-
-
-                </Group>
-
-
-
-              </Card>
-
-
-
-            ))
-
-            }
-
-
-
-          </Stack>
-
-
-
-{
-allowPayment && (
-
-
-          <Button
-
-
-            color="green"
-
-            radius="xl"
-
-            disabled={
-              selectedIds.length === 0
-            }
-
-
-            onClick={() =>
-              setConfirmOpened(true)
-            }
-
-
+          <Text
+            fw={700}
+            size="xs"
           >
+            عدد المخالفات
+          </Text>
 
-            تسديد المحدد
-
-            {" "}
-
-            ({selectedIds.length})
-
-
-          </Button>
-
-
-)}
-
+           <Badge
+        size="sm"
+        radius="xl"
+        variant="light"
+        color="orange"
+      >
+        {failures.length} مخالفة
+      </Badge>
 
         </Stack>
 
 
+        <Group gap={6}>
 
-      </Modal>
+          <ActionIcon
+            variant="light"
+            color="green"
+            size="md"
+            radius="xl"
+            onClick={exportExcel}
+          >
+            <IconFileSpreadsheet size={18}/>
+          </ActionIcon>
+
+
+          {
+            allowPayment && (
+
+              <Button
+                size="xs"
+                radius="xl"
+                variant="light"
+                onClick={selectAll}
+              >
+                {
+                  selectedIds.length === failures.length
+                  ? "إلغاء التحديد"
+                  : "تحديد الكل"
+                }
+              </Button>
+
+            )
+          }
+
+        </Group>
+
+
+      </Group>
+
+    </Card>
+
+
+
+    <Divider />
+
+
+    <Stack
+      gap="xs"
+      style={{
+       
+        overflowY:"auto"
+      }}
+    >
+
+      {
+        failures.map((item,index)=>(
+
+          <Card
+           dir="rtl"
+            key={`${item.id}-${index}`}
+            withBorder
+            radius="md"
+            p="xs"
+            shadow="xs"
+          
+          >
+
+          <Group
+         
+  justify="space-between"
+  align="lift"
+  w="100%"
+>
+
+  
+
+
+  <Group gap="xs">
+
+    <Badge
+      size="sm"
+      radius="xl"
+      color="blue"
+      variant="light"
+    >
+      {item.id}
+    </Badge>
+
+
+    <Text
+      size="xs"
+      fw={700}
+    >
+      {item.district}
+      {" - "}
+      {item.block}
+    </Text>
+
+  </Group>
+{
+    allowPayment && (
+      <Checkbox
+        size="xs"
+        checked={selectedIds.includes(item.id)}
+        onChange={() => toggleSelect(item.id)}
+      />
+    )
+  }
+
+</Group>
+
+
+          </Card>
+
+        ))
+      }
+
+
+    </Stack>
+
+
+
+    {
+      allowPayment && (
+
+        <Button
+          fullWidth
+          size="sm"
+          radius="xl"
+          color="green"
+          disabled={
+            selectedIds.length === 0
+          }
+          onClick={() =>
+            setConfirmOpened(true)
+          }
+        >
+          تسديد المحدد ({selectedIds.length})
+        </Button>
+
+      )
+    }
+
+
+  </Stack>
+
+
+</Modal>
 
 
 
