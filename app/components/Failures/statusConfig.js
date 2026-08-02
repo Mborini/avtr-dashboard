@@ -62,4 +62,11 @@ export const statusConfig = {
     icon:<IconClock size={18}/>
   },
 
+  
+  Rejected:{
+    label:"رفض مقبول ",
+    color:"pink",
+    bg:"#f35376",
+    icon:<IconClock size={18}/>
+  },
 };

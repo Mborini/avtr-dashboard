@@ -16,7 +16,6 @@ import {
   Box,
 } from "@mantine/core";
 
-
 import {
   IconBuildings,
   IconEye,
@@ -25,12 +24,11 @@ import {
   IconUser,
 } from "@tabler/icons-react";
 
-
+import FailureListModal from "../FailureListModal";
 import {
   statusConfig,
   summaryOnlyStatuses
 } from "./statusConfig";
-
 
 
 
@@ -39,7 +37,14 @@ export default function DistrictCard({
   data
 }) {
 
+const [failureModalOpened,setFailureModalOpened] = useState(false);
 
+
+const [selectedFailures,setSelectedFailures] = useState([]);
+
+
+const [selectedStatus,setSelectedStatus] = useState("");
+const [selectedStatusKey,setSelectedStatusKey] = useState("");
   const [opened, setOpened] = useState(false);
 
   const [selectedUser, setSelectedUser] = useState(null);
@@ -264,6 +269,180 @@ export default function DistrictCard({
       main: "#868e96",
       light: "#f1f3f5"
     };
+
+
+    const exportDistrictExcel = () => {
+
+
+  const rows = [];
+
+
+  Object.entries(data.blocks || {})
+    .forEach(([block, blockData]) => {
+
+
+      const row = {
+
+        "المنطقة": district,
+
+        "الحي": block,
+
+        "إجمالي المخالفات":
+          blockData.total,
+
+
+        "في انتظار القبول": 0,
+
+        "قيد التنفيذ": 0,
+
+        "قيد مراجعة AVTR": 0,
+
+        "انتظار التحقق الميداني": 0,
+
+        "تم الحل": 0,
+
+        "تم رفض الحل": 0,
+
+        "مرفوض": 0,
+
+      };
+
+
+
+      Object.entries(blockData.statuses || {})
+        .forEach(([status,statusData])=>{
+
+
+          const map = {
+
+            PendingSpValidation:
+            "في انتظار القبول",
+
+            InProgress:
+            "قيد التنفيذ",
+
+            PendingSupervisorReview:
+            "قيد مراجعة AVTR",
+
+            PendingFieldMonitorVerification:
+            "انتظار التحقق الميداني",
+
+            Resolved:
+            "تم الحل",
+
+            ResolutionRejected:
+            "تم رفض الحل",
+
+            Rejected:
+            "مرفوض"
+
+          };
+
+
+          const key = map[status];
+
+
+          if(key){
+
+            row[key] =
+              statusData.total;
+
+          }
+
+
+        });
+
+
+
+      const field =
+        row["انتظار التحقق الميداني"] || 0;
+
+
+      const resolved =
+        row["تم الحل"] || 0;
+
+
+
+      row["نسبة الإنجاز"] =
+        blockData.total
+        ?
+        (((field + resolved) /
+        blockData.total)*100)
+        .toFixed(1)+"%"
+        :
+        "0%";
+
+
+
+      rows.push(row);
+
+
+    });
+
+
+
+  // إضافة Footer
+
+  const total = {
+
+    "الحي":"المجموع"
+
+  };
+
+
+  Object.keys(rows[0])
+  .forEach(key=>{
+
+
+    if(
+      key !== "المنطقة" &&
+      key !== "الحي" &&
+      key !== "نسبة الإنجاز"
+    ){
+
+      total[key] =
+      rows.reduce(
+        (sum,row)=>
+        sum + Number(row[key]||0),
+        0
+      );
+
+    }
+
+
+  });
+
+
+
+  rows.push(total);
+
+
+
+  const sheet =
+    XLSX.utils.json_to_sheet(rows);
+
+
+
+  const book =
+    XLSX.utils.book_new();
+
+
+
+  XLSX.utils.book_append_sheet(
+    book,
+    sheet,
+    district
+  );
+
+
+
+  XLSX.writeFile(
+    book,
+    `تقرير_${district}.xlsx`
+  );
+
+
+};
   return (
 
     <Card
@@ -467,9 +646,7 @@ export default function DistrictCard({
         <Card
 
           radius="24"
-
-          p="lg"
-
+          p="xs"
           mt="md"
           mb="md"
           style={{
@@ -482,7 +659,7 @@ export default function DistrictCard({
 
             alignItems: "center",
 
-            gap: "md"
+            gap: "sm"
 
           }}
 
@@ -521,27 +698,120 @@ export default function DistrictCard({
                 .map(([status, count]) => (
 
 
-                  <Badge
+                <Badge
 
-                    key={status}
+ key={status}
 
-                    radius="xl"
+ size="lg"
 
-                    px="md"
+ radius="xl"
 
-                    py={10}
+ px="md"
 
-                    size="lg"
+ py={10}
 
-                    variant="light"
+ variant="light"
 
-                    color={
-                      statusConfig[status]?.color || "gray"
-                    }
+ color={
+   statusConfig[status]?.color || "gray"
+ }
 
-                  >
+ style={{
+   cursor:"pointer"
+ }}
+
+onClick={()=>{
 
 
+const failures=[];
+
+
+Object.entries(data.blocks || {})
+.forEach(([blockName, blockData])=>{
+
+
+const statusData =
+blockData.statuses?.[status];
+
+
+
+if(!statusData)
+return;
+
+
+
+// مخالفات المستخدمين
+
+Object.values(statusData.users || {})
+.forEach(user=>{
+
+
+(user.ids || []).forEach(id=>{
+
+
+failures.push({
+
+id,
+
+district,
+
+block:blockName
+
+});
+
+
+});
+
+
+});
+
+
+
+// الحالات بدون مستخدم
+
+(statusData.ids || [])
+.forEach(id=>{
+
+
+failures.push({
+
+id,
+
+district,
+
+block:blockName
+
+});
+
+
+});
+
+
+});
+
+
+
+
+console.log("FAILURES =>", failures);
+
+
+
+setSelectedFailures(failures);
+
+
+
+setSelectedStatus(
+ statusConfig[status]?.label || status
+);
+
+setSelectedStatusKey(status);
+
+setFailureModalOpened(true);
+
+
+}}
+
+>
                     <Group
 
                       gap={8}
@@ -1373,8 +1643,27 @@ export default function DistrictCard({
 
 
       </Modal>
+    
+
+
+    <FailureListModal
+
+opened={failureModalOpened}
+
+onClose={() =>
+setFailureModalOpened(false)
+}
+
+title={`قائمة مخالفات ${selectedStatus}`}
+
+failures={selectedFailures}
+
+status={selectedStatusKey}
+
+/>
 
     </Card>
+    
 
 
   );
@@ -1436,4 +1725,5 @@ export default function DistrictCard({
     );
 
   }
+  
 }

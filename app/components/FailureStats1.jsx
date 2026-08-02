@@ -678,7 +678,7 @@ export default function FailureStatsCollapsible({
 
 
                                             <Badge size="xs">
-                                              {count}
+                                             {Number(count || 0)}
                                             </Badge>
 
 
