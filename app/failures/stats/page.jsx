@@ -157,7 +157,7 @@ export default function StatsPage() {
 
       params.append(
         "limit",
-        "100000"
+        "1000"
       );
 
 

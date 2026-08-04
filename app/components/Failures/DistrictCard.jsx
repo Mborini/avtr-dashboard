@@ -14,6 +14,9 @@ import {
   Modal,
   Button,
   Box,
+  ScrollArea,
+  Table,
+  Progress,
 } from "@mantine/core";
 
 import {
@@ -69,7 +72,7 @@ const [selectedStatusKey,setSelectedStatusKey] = useState("");
 
   const districtUsersByStatus = {};
 
-
+const usersAchievement = {};
 
   Object.values(data.blocks || {})
     .forEach((block) => {
@@ -130,7 +133,85 @@ const [selectedStatusKey,setSelectedStatusKey] = useState("");
 
 
 
+    });// ================================
+// تجميع إنجاز المستخدمين
+// Resolved + PendingFieldMonitorVerification
+// ================================
+
+Object.values(data.blocks || {})
+.forEach((block)=>{
+
+
+  Object.entries(block.statuses || {})
+  .forEach(([status,statusData])=>{
+
+
+    if(
+      status !== "Resolved" &&
+      status !== "PendingFieldMonitorVerification"
+    )
+    return;
+
+
+    Object.entries(statusData.users || {})
+    .forEach(([user,userData])=>{
+
+
+      if(!usersAchievement[user]){
+
+        usersAchievement[user]={
+          name:user,
+          resolved:0,
+          field:0,
+          total:0,
+          ids:[]
+        };
+
+      }
+
+
+
+      if(status==="Resolved"){
+
+        usersAchievement[user].resolved += userData.count;
+
+      }
+
+
+
+      if(status==="PendingFieldMonitorVerification"){
+
+        usersAchievement[user].field += userData.count;
+
+      }
+
+
+
+      usersAchievement[user].ids.push(
+        ...(userData.ids || [])
+      );
+
+
     });
+
+
+
+  });
+
+
+});const rankedUsers =
+Object.values(usersAchievement)
+.map(user=>({
+
+ ...user,
+
+ total:
+ user.resolved + user.field
+
+}))
+.sort(
+(a,b)=> b.total - a.total
+);
   Object.keys(statusConfig).forEach((status) => {
 
     districtStatuses[status] = 0;
@@ -1451,13 +1532,14 @@ setFailureModalOpened(true);
 
 
 
-      </Modal><Modal
+      </Modal>
+      <Modal
         dir="rtl"
         opened={usersModalOpened}
         onClose={() => setUsersModalOpened(false)}
         centered
         size="lg"
-        title="ملخص حالات المخالفات حسب المستخدمين"
+title="🏆 ترتيب إنجاز المستخدمين"
         styles={{
           title: {
             fontSize: "15px",
@@ -1465,180 +1547,321 @@ setFailureModalOpened(true);
           }
         }}
       >
+<Box
+  mb="md"
+  style={{
+    display:"flex",
+    justifyContent:"center"
+  }}
+>
 
+<Group
+  align="end"
+  gap="sm"
+>
 
-        <Stack gap="sm">
 
+{
+rankedUsers.slice(0,3).reverse().map((user,index)=>{
 
-          {
-            Object.entries(districtUsersByStatus)
-              .map(([status, users]) => (
 
+const realIndex =
+2-index;
 
-                <Card
 
-                  key={status}
+return (
+<Card
+key={user.name}
+radius="xl"
+p="xs"
+style={{
 
-                  radius="lg"
+width:120,
 
-                  p="md"
+minHeight:
+realIndex===0
+?180
+:
+realIndex===1
+?160
+:
+140,
 
-                  style={{
+background:
+realIndex===0
+?
+"linear-gradient(135deg,#ffd43b,#fab005)"
+:
+realIndex===1
+?
+"linear-gradient(135deg,#dee2e6,#adb5bd)"
+:
+"linear-gradient(135deg,#ffa94d,#e67700)",
 
-                    background:
-                      statusConfig[status]?.bg || "#fff",
 
-                    border: "1px solid #edf2f7"
+textAlign:"center",
 
-                  }}
+display:"flex",
 
-                >
+flexDirection:"column",
 
+alignItems:"center",
 
-                  <Group
-                    justify="space-between"
-                    mb="sm"
-                  >
+justifyContent:"center",
 
+overflow:"visible"
 
-                    <Text
+}}
+>
 
-                      fw={800}
+<Text
+size="30px"
+>
+{
+realIndex===0
+?
+"🥇"
+:
+realIndex===1
+?
+"🥈"
+:
+"🥉"
+}
+</Text>
 
-                      size="sm"
 
-                    >
+<Avatar
 
-                      {
-                        statusConfig[status]?.label || status
-                      }
+mx="auto"
 
-                    </Text>
+color="blue"
 
+>
 
+{user.name.charAt(0)}
 
-                    <Badge
+</Avatar>
 
-                      color={
-                        statusConfig[status]?.color || "gray"
-                      }
 
-                      variant="light"
+<Text
 
-                    >
+fw={800}
 
-                      {
-                        Object.values(users)
-                          .reduce(
-                            (sum, user) => sum + user.count,
-                            0
-                          )
-                      }
+size="xs"
 
-                    </Badge>
+mt={8}
 
+ta="center"
 
-                  </Group>
+style={{
+maxWidth:100,
+lineHeight:1.2,
+wordBreak:"break-word"
+}}
 
+>
 
+{user.name}
 
+</Text>
 
 
-                  <Stack gap={6}>
+<Badge
 
+mt={5}
 
-                    {
-                      Object.entries(users)
-                        .map(([user, userData]) => (
+variant="filled"
 
+color="dark"
 
-                          <Group
+>
 
-                            key={user}
+{user.total}
 
-                            justify="space-between"
+</Badge>
 
-                            p="xs"
 
-                            style={{
+</Card>
 
-                              background: "#ffffff",
+)
 
-                              borderRadius: 8
+})
 
-                            }}
+}
 
-                          >
 
+</Group>
 
-                            <Group gap="xs">
 
+</Box>
 
-                              <Avatar
+<Stack gap="md">
 
-                                size="sm"
 
-                                color="blue"
+      <ScrollArea>
 
-                                variant="light"
+<Table
+  striped
+  highlightOnHover
+  withTableBorder
+  dir="rtl"
+>
 
-                              >
+<Table.Thead>
 
-                                {user.charAt(0)}
+<Table.Tr>
 
-                              </Avatar>
+<Table.Th>
+المستخدم
+</Table.Th>
 
 
+<Table.Th>
+تم الحل
+</Table.Th>
 
-                              <Text
 
-                                size="sm"
+<Table.Th>
+انتظار التحقق
+</Table.Th>
 
-                                fw={700}
 
-                              >
+<Table.Th>
+الإجمالي
+</Table.Th>
 
-                                {user}
 
-                              </Text>
 
 
-                            </Group>
+</Table.Tr>
 
+</Table.Thead>
 
 
 
-                            <Badge
+<Table.Tbody>
 
-                              variant="outline"
 
-                            >
+{
+rankedUsers.map((user)=>{
 
-                              {userData.count}
 
-                            </Badge>
 
 
+return (
 
-                          </Group>
+<Table.Tr
+key={user.name}
+>
 
 
-                        ))
+<Table.Td>
 
-                    }
 
+<Group gap="xs">
 
-                  </Stack>
+<Avatar
 
+size="sm"
 
+color="blue"
 
-                </Card>
+variant="light"
 
+>
 
-              ))
+{user.name.charAt(0)}
 
+</Avatar>
 
-          }
+
+<Text
+fw={700}
+size="sm"
+>
+
+{user.name}
+
+</Text>
+
+
+</Group>
+
+
+</Table.Td>
+
+
+
+<Table.Td>
+
+<Badge
+color="green"
+variant="light"
+>
+
+{user.resolved}
+
+</Badge>
+
+
+</Table.Td>
+
+
+
+
+<Table.Td>
+
+<Badge
+color="blue"
+variant="light"
+>
+
+{user.field}
+
+</Badge>
+
+
+</Table.Td>
+
+
+
+
+<Table.Td>
+
+<Text
+fw={900}
+>
+
+{user.total}
+
+</Text>
+
+</Table.Td>
+
+
+
+
+
+
+
+</Table.Tr>
+
+
+)
+
+
+})
+}
+
+
+</Table.Tbody>
+
+
+</Table>
+
+
+</ScrollArea>
 
 
 

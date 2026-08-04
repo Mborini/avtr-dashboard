@@ -110,8 +110,7 @@ const finalUser =
   lastActivity?.userName ??
   "غير معروف";
 
-console.log("Resolution Activity =>", resolutionActivity);
-console.log("Resolution User =>", finalUser);
+
      return {
   id: item.id,
 
