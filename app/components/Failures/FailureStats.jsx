@@ -58,22 +58,15 @@ export default function FailureStats({
 
 
 
-      let lastUser = null;
+     let lastUser = null;
 
+if (!summaryOnlyStatuses.includes(status)) {
 
+  lastUser =
+    item.userName ||
+    "غير معروف";
 
-      if (
-        !summaryOnlyStatuses.includes(status) &&
-        item.activities?.length
-      ) {
-
-        lastUser =
-          item.activities.at(-1)?.userName ||
-          "Unknown";
-
-      }
-
-
+}
 
 
 

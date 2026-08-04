@@ -723,7 +723,7 @@ const [selectedStatusKey,setSelectedStatusKey] = useState("");
 onClick={()=>{
 
 
-const failures=[];
+const failureMap = new Map();
 
 
 Object.entries(data.blocks || {})
@@ -734,13 +734,10 @@ const statusData =
 blockData.statuses?.[status];
 
 
-
 if(!statusData)
 return;
 
 
-
-// مخالفات المستخدمين
 
 Object.values(statusData.users || {})
 .forEach(user=>{
@@ -749,7 +746,7 @@ Object.values(statusData.users || {})
 (user.ids || []).forEach(id=>{
 
 
-failures.push({
+failureMap.set(id,{
 
 id,
 
@@ -766,14 +763,12 @@ block:blockName
 });
 
 
-
-// الحالات بدون مستخدم
 
 (statusData.ids || [])
 .forEach(id=>{
 
 
-failures.push({
+failureMap.set(id,{
 
 id,
 
@@ -791,8 +786,17 @@ block:blockName
 
 
 
+const failures = Array.from(
+  failureMap.values()
+);
 
-console.log("FAILURES =>", failures);
+
+
+setSelectedFailures(failures);
+
+
+
+
 
 
 
